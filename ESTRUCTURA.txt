@@ -1,0 +1,7 @@
+v37 – Sección Videos en index.html
+
+index.html:
+  + Nueva card "Videos Educativos" 🎬
+  + href="videos.html"
+  + Tag "En desarrollo" en morado (tag-vid)
+  + Variables CSS claro/oscuro para el tag

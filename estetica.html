@@ -1,0 +1,810 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Educación Estética 4° Grado – BiblioMara</title>
+<link href="https://api.fontshare.com/v2/css?f[]=satoshi@400,500,700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --pink:#AD1457;--pink2:#880E4F;--pink3:#FCE4EC;
+  --surface:#f7f6f2;--surface2:#fff;--text:#1a1a1a;--muted:#666;
+  --border:#e0e0e0;--sidebar-bg:#fff;--card-bg:#fff;
+  --tab-bg:#f0f0f0;--tab-active:#fff;
+  --topic-hover:#f9f0f4;--topic-active:#FCE4EC;--topic-active-text:#AD1457;
+  --header-bg:linear-gradient(135deg,#AD1457,#880E4F);
+  --radius:10px;--shadow:0 2px 12px rgba(0,0,0,.1);
+  --font:'Satoshi',sans-serif;--tr:.22s;
+}
+[data-theme="dark"]{
+  --surface:#0f0f1a;--surface2:#1a1a2e;--text:#e8e8f0;--muted:#8a8ab0;
+  --border:#2a2a45;--sidebar-bg:#16162a;--card-bg:#1e1e35;
+  --tab-bg:#1e1e35;--tab-active:#2a2a50;
+  --topic-hover:#2a1a28;--topic-active:#3d1228;--topic-active-text:#F48FB1;
+  --shadow:0 2px 14px rgba(0,0,0,.4);
+}
+body{font-family:var(--font);background:var(--surface);color:var(--text);
+     display:flex;flex-direction:column;min-height:100vh;
+     transition:background var(--tr),color var(--tr)}
+.header{background:var(--header-bg);color:#fff;padding:12px 20px;
+        display:flex;align-items:center;gap:12px;
+        box-shadow:0 2px 8px rgba(0,0,0,.3);flex-shrink:0;min-height:60px}
+.header-title{font-size:1.1rem;font-weight:700;line-height:1.2}
+.header-sub{font-size:.76rem;opacity:.8}
+.header-right{margin-left:auto;display:flex;align-items:center;gap:8px}
+.back-btn{background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.35);
+          color:#fff;padding:7px 14px;border-radius:20px;cursor:pointer;
+          font-size:.82rem;transition:.2s;white-space:nowrap}
+.back-btn:hover{background:rgba(255,255,255,.32)}
+.hamburger{display:none;flex-direction:column;gap:5px;cursor:pointer;
+           background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.3);
+           padding:8px 10px;border-radius:10px}
+.hamburger span{display:block;width:20px;height:2px;background:#fff;
+                border-radius:2px;transition:.3s}
+.theme-btn{background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.3);
+           color:#fff;width:36px;height:36px;border-radius:50%;cursor:pointer;
+           font-size:16px;display:flex;align-items:center;justify-content:center;
+           transition:.2s;flex-shrink:0}
+.theme-btn:hover{background:rgba(255,255,255,.28)}
+.main{display:flex;flex:1;overflow:hidden;height:calc(100vh - 60px)}
+.sidebar{width:255px;flex-shrink:0;background:var(--sidebar-bg);
+         border-right:1px solid var(--border);overflow-y:auto;padding-bottom:24px;
+         transition:background var(--tr),transform var(--tr)}
+.sidebar-title{padding:13px 16px;font-weight:700;font-size:.8rem;color:var(--muted);
+               text-transform:uppercase;letter-spacing:.06em;border-bottom:1px solid var(--border)}
+.bloque-header{padding:11px 16px;font-weight:700;font-size:.83rem;color:#fff;
+               cursor:pointer;display:flex;align-items:center;gap:6px;user-select:none}
+.bloque-header:hover{filter:brightness(.9)}
+.bloque-header .chev{margin-left:auto;transition:transform .25s;font-style:normal;font-weight:400}
+.bloque-header.collapsed .chev{transform:rotate(-90deg)}
+.bloque-items{overflow:hidden;transition:max-height .32s ease}
+.bloque-items.collapsed{max-height:0!important}
+.topic-item{padding:10px 16px 10px 28px;font-size:.84rem;cursor:pointer;
+            border-left:3px solid transparent;transition:.15s;color:var(--text)}
+.topic-item:hover{background:var(--topic-hover);border-left-color:#F48FB1}
+.topic-item.active{background:var(--topic-active);border-left-color:#AD1457;
+                   color:var(--topic-active-text);font-weight:600}
+.sidebar-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);
+                 z-index:40;backdrop-filter:blur(2px)}
+.content{flex:1;overflow-y:auto;padding:22px}
+.welcome{text-align:center;padding:60px 20px;color:var(--muted)}
+.welcome .big{font-size:3.5rem;margin-bottom:12px}
+.welcome h2{font-size:1.25rem;color:var(--text);margin-bottom:8px}
+.topic-panel{max-width:860px}
+.topic-header{display:flex;align-items:center;gap:14px;margin-bottom:18px;
+              padding-bottom:14px;border-bottom:2px solid var(--border)}
+.topic-emoji{font-size:2.2rem}
+.topic-info h1{font-size:1.3rem;font-weight:700}
+.topic-info p{color:var(--muted);font-size:.88rem;margin-top:2px}
+.tabs{display:flex;gap:4px;margin-bottom:18px;background:var(--tab-bg);
+      padding:4px;border-radius:10px}
+.tab{padding:8px 18px;border-radius:7px;cursor:pointer;font-size:.88rem;
+     font-weight:500;transition:.2s;color:var(--muted);border:none;background:none;
+     font-family:inherit}
+.tab.active{background:var(--tab-active);color:#AD1457;box-shadow:0 1px 4px rgba(0,0,0,.12)}
+.books-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:14px}
+.book-card{background:var(--card-bg);border-radius:var(--radius);padding:18px;
+           box-shadow:var(--shadow);cursor:pointer;transition:.2s;
+           border:2px solid transparent;display:flex;flex-direction:column;gap:8px}
+.book-card:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(0,0,0,.16);
+                 border-color:#AD1457}
+.book-icon{font-size:2rem}
+.book-title{font-weight:700;font-size:.93rem;line-height:1.3;color:var(--text)}
+.book-author{font-size:.78rem;color:var(--muted)}
+.book-pts{display:inline-block;background:var(--topic-active);color:#AD1457;
+          padding:3px 10px;border-radius:20px;font-size:.76rem;font-weight:600}
+.book-btn{margin-top:auto;padding:10px;background:#AD1457;color:#fff;border:none;
+          border-radius:8px;cursor:pointer;font-size:.84rem;font-weight:600;
+          transition:.2s;font-family:inherit}
+.book-btn:hover{background:#880E4F}
+.video-placeholder{text-align:center;padding:50px 20px;background:var(--card-bg);
+                   border-radius:var(--radius);box-shadow:var(--shadow);color:var(--muted)}
+.video-placeholder .icon{font-size:3rem;margin-bottom:10px}
+.video-placeholder h3{color:var(--text);font-size:1rem;margin-bottom:6px}
+.enc-wrap{max-width:580px;margin:0 auto}
+.enc-status{display:flex;align-items:center;gap:10px;background:#e8f5e9;
+            border:1.5px solid #a5d6a7;border-radius:12px;padding:14px 18px;margin-bottom:16px}
+.enc-status.bloq{background:#fff3e0;border-color:#ffcc80}
+.enc-status.err{background:#ffebee;border-color:#ef9a9a}
+.enc-icon{font-size:1.6rem}
+.enc-txt{font-size:.88rem;color:var(--text);line-height:1.5}
+.enc-pts{font-weight:700;color:#2e7d32;font-size:1rem}
+.enc-status.bloq .enc-pts{color:#e65100}
+.enc-status.err .enc-pts{color:#c62828}
+.enc-btn{display:inline-flex;align-items:center;gap:7px;
+         background:linear-gradient(135deg,#c2185b,#AD1457);color:#fff;border:none;
+         border-radius:10px;padding:11px 22px;font-size:.9rem;font-weight:700;
+         cursor:pointer;transition:.2s;font-family:inherit}
+.enc-btn:hover{transform:translateY(-2px);box-shadow:0 4px 14px rgba(173,20,87,.35)}
+.enc-btn.done{background:linear-gradient(135deg,#2e7d32,#1b5e20);cursor:default}
+.enc-btn.done:hover{transform:none;box-shadow:none}
+.quiz-wrap{background:var(--card-bg);border-radius:14px;
+           box-shadow:0 2px 12px rgba(0,0,0,.08);padding:22px}
+.quiz-progress{display:flex;align-items:center;gap:10px;margin-bottom:18px}
+.quiz-bar-bg{flex:1;height:8px;background:#e0e0e0;border-radius:4px;overflow:hidden}
+.quiz-bar{height:100%;background:linear-gradient(90deg,#c2185b,#e91e8c);
+          border-radius:4px;transition:.4s}
+.quiz-qnum{font-size:.78rem;color:#888;white-space:nowrap}
+.quiz-q{font-size:1rem;font-weight:700;color:var(--text);margin-bottom:16px;line-height:1.5}
+.quiz-opts{display:flex;flex-direction:column;gap:9px;margin-bottom:20px}
+.quiz-opt{padding:12px 16px;border-radius:10px;border:2px solid #e0e0e0;
+          background:var(--surface2);cursor:pointer;font-size:.9rem;transition:.18s;
+          text-align:left;font-family:inherit;color:var(--text)}
+.quiz-opt:hover{border-color:#c2185b;background:#FCE4EC}
+.quiz-opt.correct{border-color:#2e7d32;background:#e8f5e9;color:#1b5e20;font-weight:700}
+.quiz-opt.wrong{border-color:#c62828;background:#ffebee;color:#b71c1c;font-weight:700}
+.quiz-opt.reveal{border-color:#2e7d32;background:#e8f5e9;color:#1b5e20}
+.quiz-feedback{min-height:28px;font-size:.85rem;font-weight:600;
+               margin-bottom:14px;padding:8px 12px;border-radius:8px;display:none}
+.quiz-feedback.show{display:block}
+.quiz-feedback.ok{background:#e8f5e9;color:#2e7d32}
+.quiz-feedback.fail{background:#ffebee;color:#c62828}
+.quiz-next{padding:10px 24px;background:#c2185b;color:#fff;border:none;
+           border-radius:9px;cursor:pointer;font-size:.9rem;font-weight:700;
+           font-family:inherit;transition:.2s;display:none}
+.quiz-next.show{display:inline-flex;align-items:center;gap:6px}
+.quiz-next:hover{background:#AD1457}
+.quiz-result{text-align:center;padding:28px 16px}
+.res-emoji{font-size:3.5rem;display:block;margin-bottom:12px}
+.quiz-result h3{font-size:1.3rem;font-weight:700;margin-bottom:6px}
+.res-pts{font-size:1.6rem;font-weight:900;color:#c2185b;background:#FCE4EC;
+         border-radius:12px;padding:10px 24px;display:inline-block;margin:12px 0}
+.quiz-result p{font-size:.88rem;color:var(--muted);margin-bottom:18px}
+@media(max-width:700px){
+  .hamburger{display:flex}
+  .header-title{font-size:.95rem}
+  .back-btn span{display:none}
+  .sidebar{position:fixed;left:0;top:0;height:100%;z-index:50;
+           transform:translateX(-100%);width:78%;max-width:300px;
+           box-shadow:4px 0 24px rgba(0,0,0,.3)}
+  .sidebar.open{transform:translateX(0)}
+  .sidebar-overlay.open{display:block}
+  .main{flex-direction:column;height:calc(100vh - 60px)}
+  .content{padding:14px}
+  .books-grid{grid-template-columns:1fr}
+  .topic-header{flex-direction:column;align-items:flex-start;gap:8px}
+  .tabs{overflow-x:auto;-webkit-overflow-scrolling:touch}
+  .tab{white-space:nowrap;padding:8px 14px;font-size:.82rem}
+}
+</style>
+</head>
+<body>
+<header class="header">
+  <button class="hamburger" id="menuBtn" aria-label="Menu" onclick="toggleSidebar()">
+    <span></span><span></span><span></span>
+  </button>
+  <svg width="34" height="34" viewBox="0 0 36 36" fill="none" aria-hidden="true">
+    <rect width="36" height="36" rx="8" fill="white" fill-opacity="0.2"/>
+    <text x="18" y="25" text-anchor="middle" font-size="20" fill="white">🎨</text>
+  </svg>
+  <div>
+    <div class="header-title">Educación Estética 4° Grado</div>
+    <div class="header-sub">BiblioMara – UEP Instituto Mara</div>
+  </div>
+  <div class="header-right">
+    <button class="theme-btn" id="themeBtn" onclick="toggleTheme()" title="Cambiar tema">🌙</button>
+    <button class="back-btn" onclick="window.location.href='biblioteca.html'">&#8592; <span>Inicio</span></button>
+  </div>
+</header>
+
+<div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+
+<div class="main">
+  <nav class="sidebar" id="sidebar">
+    <div class="sidebar-title">&#128218; Temas</div>
+
+    <div class="bloque-header" onclick="toggleBloque('B1')" style="background:#AD1457">
+      &#127912; Expresión Plástica <i class="chev">&#8250;</i>
+    </div>
+    <div class="bloque-items" id="bloque-B1">
+      <div class="topic-item" id="item-elementos" onclick="selectTopic('elementos')">Elementos de la Expresión Plástica</div>
+      <div class="topic-item" id="item-tecnicas"  onclick="selectTopic('tecnicas')">Técnicas Plásticas</div>
+    </div>
+
+    <div class="bloque-header" onclick="toggleBloque('B2')" style="background:#6A1B9A">
+      &#127925; Educación Musical <i class="chev">&#8250;</i>
+    </div>
+    <div class="bloque-items" id="bloque-B2">
+      <div class="topic-item" id="item-sonido"       onclick="selectTopic('sonido')">El Sonido y sus Propiedades</div>
+      <div class="topic-item" id="item-ritmo"        onclick="selectTopic('ritmo')">Ritmo y Melodía</div>
+      <div class="topic-item" id="item-instrumentos" onclick="selectTopic('instrumentos')">Instrumentos Musicales Venezolanos</div>
+      <div class="topic-item" id="item-musicapop"    onclick="selectTopic('musicapop')">Música Popular Venezolana</div>
+    </div>
+
+    <div class="bloque-header" onclick="toggleBloque('B3')" style="background:#E65100">
+      &#127917; Arte Escénico <i class="chev">&#8250;</i>
+    </div>
+    <div class="bloque-items" id="bloque-B3">
+      <div class="topic-item" id="item-teatro" onclick="selectTopic('teatro')">Teatro y Dramatización</div>
+      <div class="topic-item" id="item-danza"  onclick="selectTopic('danza')">Danza y Expresión Corporal</div>
+    </div>
+
+    <div class="bloque-header" onclick="toggleBloque('B4')" style="background:#00695C">
+      &#127963; Arte y Cultura <i class="chev">&#8250;</i>
+    </div>
+    <div class="bloque-items" id="bloque-B4">
+      <div class="topic-item" id="item-artepop"    onclick="selectTopic('artepop')">Arte Popular y Artesanía</div>
+      <div class="topic-item" id="item-disenio"    onclick="selectTopic('disenio')">Diseño Gráfico, Señales y Símbolos</div>
+      <div class="topic-item" id="item-patrimonio" onclick="selectTopic('patrimonio')">Patrimonio Artístico Venezolano</div>
+    </div>
+  </nav>
+
+  <main class="content" id="content">
+    <div class="welcome">
+      <div class="big">&#127912;</div>
+      <h2>¡Bienvenido a Educación Estética!</h2>
+      <p>Selecciona un tema del menú lateral para ver los libros disponibles.</p>
+      <p style="margin-top:8px;font-size:.85rem">11 temas · 4 bloques</p>
+    </div>
+  </main>
+</div>
+
+<script>
+const LIBROS = {
+  elementos:[
+    {title:"Manual Educación Artística 4°",author:"Zona del Docente",url:"https://drive.google.com/file/d/1LXW6LtFF2TGKXMJfvyrAApLgGRpOIkQs/preview",icon:"📘",pts:20,color:"#AD1457"},
+    {title:"Ed. Artística – Artes Visuales y Color",author:"Blog Nivelación",url:"https://drive.google.com/file/d/1fZblpK1JbNURuLdne6mNGTQeQ9VVPB3r/preview",icon:"🎨",pts:20,color:"#AD1457"},
+    {title:"Guía de Arte 4° – Elementos Visuales",author:"Colombia",url:"https://docs.google.com/document/d/1ZGCwPVTjC4xVYXOTXk4qIypPeOr3BR75/preview",icon:"📗",pts:15,color:"#AD1457"},
+  ],
+  tecnicas:[
+    {title:"Educación Plástica 4to Grado",author:"MINED Cuba",url:"https://drive.google.com/file/d/1JQ4i_rb3SyLOVsSU2yyhzO-WZmz0XHeF/preview",icon:"🖌️",pts:20,color:"#AD1457"},
+    {title:"El Arte en el Aula – Guía Plástica",author:"OEI",url:"https://drive.google.com/file/d/1A4u35VkqD8KU84DYTYOPvDdAQA34uPQt/preview",icon:"📘",pts:20,color:"#AD1457"},
+    {title:"Artes Plásticas – Primer Básico",author:"GUAO",url:"https://drive.google.com/file/d/1d6h21nwmYfAdMo_i_vuCv88Ky7TIgLSa/preview",icon:"🎭",pts:15,color:"#AD1457"},
+  ],
+  sonido:[
+    {title:"Metodología en Educación Musical",author:"MPPE / GUAO",url:"https://drive.google.com/file/d/1NZGxjhocO4aQ_furrWyFe30AFp2pdWM_/preview",icon:"🎵",pts:20,color:"#6A1B9A"},
+    {title:"Manual Educación Artística 4°",author:"Zona del Docente",url:"https://drive.google.com/file/d/1iwYrvEXZFQAYioSpx7OX1OWB-X9QmDJy/preview",icon:"📘",pts:20,color:"#6A1B9A"},
+    {title:"Guía de Arte 4° – El Sonido",author:"Colombia",url:"https://drive.google.com/file/d/1ggI0LyquvqXdN4vM4WK2Gp48Hcxz_KB3/preview",icon:"📗",pts:15,color:"#6A1B9A"},
+  ],
+  ritmo:[
+    {title:"Metodología en Educación Musical",author:"MPPE / GUAO",url:"https://drive.google.com/file/d/1lxyiq5I_tfblLiJleKqN9tzlxPit3J7O/preview",icon:"🎶",pts:20,color:"#6A1B9A"},
+    {title:"Ed. Artística 2do año – Recorriendo el Arte",author:"GUAO / Bicentenario",url:"https://drive.google.com/file/d/178tNVBqC55IX2Pdt7MbPR-O0wS1hJE92/preview",icon:"🎼",pts:20,color:"#6A1B9A"},
+    {title:"Ed. Artística – Danza, Música y Teatro 4to",author:"Blog Nivelación",url:"https://drive.google.com/file/d/1ThRnCcprIddVjQWJeRX1_48bo8E-65bg/preview",icon:"📘",pts:15,color:"#6A1B9A"},
+  ],
+  instrumentos:[
+    {title:"Metodología en Educación Musical",author:"MPPE / GUAO",url:"https://drive.google.com/file/d/1BDXGvAmKtcPikgkt1mGXfCR-wHbxSB9t/preview",icon:"🎸",pts:20,color:"#6A1B9A"},
+    {title:"Ed. Artística 1er año – Arte y Música Venezuela",author:"GUAO / Bicentenario",url:"https://drive.google.com/file/d/1pdUCnvQY6bH2Y_NeQTfX0IqP717GyKH7/preview",icon:"🎺",pts:20,color:"#6A1B9A"},
+    {title:"Ed. Artística 2do año – Recorriendo el Arte",author:"GUAO / Bicentenario",url:"https://drive.google.com/file/d/1OjJNTet6ZYxLWKFR2Jw6DaHiL6U71bhT/preview",icon:"🎼",pts:15,color:"#6A1B9A"},
+  ],
+  musicapop:[
+    {title:"Ed. Artística 1er año – Arte y Música Venezuela",author:"GUAO / Bicentenario",url:"https://drive.google.com/file/d/1WoqCXyGHncDowVrLqFSCl3Lh7GySfQ2C/preview",icon:"🎻",pts:20,color:"#6A1B9A"},
+    {title:"Metodología en Educación Musical",author:"MPPE / GUAO",url:"https://drive.google.com/file/d/161NIwoyVBz90Q3LITzCsEDM8Fm7pjbTB/preview",icon:"🎵",pts:20,color:"#6A1B9A"},
+    {title:"Ed. Artística 2do año – Recorriendo el Arte",author:"GUAO / Bicentenario",url:"https://drive.google.com/file/d/1qPU3F78ZvoQ6b85dzBUskYpRz50CbaHc/preview",icon:"🎼",pts:15,color:"#6A1B9A"},
+  ],
+  teatro:[
+    {title:"Jugar al Teatro – Libro para Niños",author:"Ella Ferrere",url:"https://drive.google.com/file/d/1Defo4-h_ENXAOW_3yNvA9amNvEbc6kgT/preview",icon:"🎭",pts:20,color:"#E65100"},
+    {title:"Manual de Juegos y Ejercicios Teatrales",author:"Escuela de Teatro Argentina",url:"https://drive.google.com/file/d/1x43C1KMqFi9StMRHZCFFNMlEbnRKeoTA/preview",icon:"🎪",pts:20,color:"#E65100"},
+    {title:"El Taller de Teatro – Primaria",author:"OEI",url:"https://drive.google.com/file/d/11EGvnqyZ_5FqmtbgO6A6nihKtvXHx6IV/preview",icon:"📘",pts:15,color:"#E65100"},
+    {title:"Manual Educación Artística 4°",author:"Zona del Docente",url:"https://drive.google.com/file/d/1Xy01USR7m1iPeXJaR2rK0iNEKvGGTCJP/preview",icon:"📗",pts:15,color:"#E65100"},
+  ],
+  danza:[
+    {title:"Artes – Segundo Ciclo / Danza",author:"MINED El Salvador",url:"https://drive.google.com/file/d/1kjuQ8r-i5AwZBibqDplgKtKxtN9MQROt/preview",icon:"💃",pts:20,color:"#E65100"},
+    {title:"Taller de Teatro – Expresión Corporal",author:"Min. Culturas Chile",url:"https://drive.google.com/file/d/1PDZQF0e-cUdPwJKDUELzvgX3Yu-YhUzF/preview",icon:"🎭",pts:20,color:"#E65100"},
+    {title:"Ed. Artística – Expresión Corporal 4to",author:"Blog Nivelación",url:"https://drive.google.com/file/d/1WPdKUtA_VkKs9hZih_eIzZEykOHDUO8d/preview",icon:"📘",pts:15,color:"#E65100"},
+    {title:"Manual Educación Artística 4°",author:"Zona del Docente",url:"https://drive.google.com/file/d/1WPdKUtA_VkKs9hZih_eIzZEykOHDUO8d/preview",icon:"📗",pts:15,color:"#E65100"},
+  ],
+  artepop:[
+    {title:"Ed. Artística 1er año – Arte Originario Venezuela",author:"GUAO / Bicentenario",url:"https://drive.google.com/file/d/1WPdKUtA_VkKs9hZih_eIzZEykOHDUO8d/preview",icon:"🏺",pts:20,color:"#00695C"},
+    {title:"Ed. Artística 2do año – Arte Popular",author:"GUAO / Bicentenario",url:"https://drive.google.com/file/d/1WPdKUtA_VkKs9hZih_eIzZEykOHDUO8d/preview",icon:"🎨",pts:20,color:"#00695C"},
+    {title:"Guía de Arte 4° – Arte y Cultura",author:"Colombia",url:"https://drive.google.com/file/d/1WPdKUtA_VkKs9hZih_eIzZEykOHDUO8d/preview",icon:"📗",pts:15,color:"#00695C"},
+  ],
+  disenio:[
+    {title:"Artes Visuales 4° Básico",author:"Currículum Nacional Chile",url:"https://drive.google.com/file/d/1WPdKUtA_VkKs9hZih_eIzZEykOHDUO8d/preview",icon:"✏️",pts:20,color:"#00695C"},
+    {title:"Manual Educación Artística 4°",author:"Zona del Docente",url:"https://drive.google.com/file/d/1WPdKUtA_VkKs9hZih_eIzZEykOHDUO8d/preview",icon:"📘",pts:20,color:"#00695C"},
+    {title:"El Arte en el Aula – Guía Plástica",author:"OEI",url:"https://drive.google.com/file/d/1WPdKUtA_VkKs9hZih_eIzZEykOHDUO8d/preview",icon:"📗",pts:15,color:"#00695C"},
+  ],
+  patrimonio:[
+    {title:"Ed. Artística 2do año – Arte Venezolano",author:"GUAO / Bicentenario",url:"https://drive.google.com/file/d/1WPdKUtA_VkKs9hZih_eIzZEykOHDUO8d/preview",icon:"🏛️",pts:20,color:"#00695C"},
+    {title:"Ed. Artística 1er año – Arte Venezolano",author:"GUAO / Bicentenario",url:"https://drive.google.com/file/d/1WPdKUtA_VkKs9hZih_eIzZEykOHDUO8d/preview",icon:"🎨",pts:20,color:"#00695C"},
+    {title:"Guía de Arte 4° – Apreciación Artística",author:"Colombia",url:"https://drive.google.com/file/d/1WPdKUtA_VkKs9hZih_eIzZEykOHDUO8d/preview",icon:"📗",pts:15,color:"#00695C"},
+  ],
+};
+
+// ── QUIZZES (primeros 4 temas) ───────────────────────────────────────────────
+
+const TOPICS = {
+  elementos:   {emoji:"🎨",title:"Elementos de la Expresión Plástica",bloque:"Expresión Plástica",color:"#AD1457"},
+  tecnicas:    {emoji:"🖌️",title:"Técnicas Plásticas",bloque:"Expresión Plástica",color:"#AD1457"},
+  sonido:      {emoji:"🔊",title:"El Sonido y sus Propiedades",bloque:"Imagen Musical",color:"#6A1B9A"},
+  ritmo:       {emoji:"🎶",title:"Ritmo y Melodía",bloque:"Imagen Musical",color:"#6A1B9A"},
+  instrumentos:{emoji:"🎸",title:"Instrumentos Musicales Venezolanos",bloque:"Imagen Musical",color:"#6A1B9A"},
+  musicapop:   {emoji:"🎻",title:"Música Popular Venezolana",bloque:"Imagen Musical",color:"#6A1B9A"},
+  teatro:      {emoji:"🎭",title:"Teatro y Dramatización",bloque:"Imagen Escénica",color:"#E65100"},
+  danza:       {emoji:"💃",title:"Danza y Expresión Corporal",bloque:"Imagen Escénica",color:"#E65100"},
+  artepop:     {emoji:"🏺",title:"Arte Popular y Artesanía Venezolana",bloque:"Arte y Cultura",color:"#00695C"},
+  disenio:     {emoji:"✏️",title:"Diseño Gráfico, Señales y Símbolos",bloque:"Arte y Cultura",color:"#00695C"},
+  patrimonio:  {emoji:"🏛️",title:"Patrimonio Artístico Venezolano",bloque:"Arte y Cultura",color:"#00695C"},
+};
+
+const ENCUESTASALL = {
+  elementos: {
+    ptsCorrecta: 10, ptsPerfecto: 10,
+    preguntas: [
+      {p: "¿Cuáles son los elementos básicos de la expresión plástica?", ops: ["Melodía, ritmo y armonía", "Punto, línea, forma y color", "Voz, gesto y movimiento", "Ritmo, danza y teatro"], r: 1},
+      {p: "¿Qué elemento plástico se forma al unir puntos de manera continua?", ops: ["El color", "La textura", "La línea", "El volumen"], r: 2},
+      {p: "¿Cuál describe mejor el COLOR en las artes plásticas?", ops: ["El contorno de los objetos", "La rugosidad de una superficie", "La sensación visual producida por la luz reflejada", "La altura de un sonido musical"], r: 2},
+      {p: "La TEXTURA en artes plásticas se refiere a:", ops: ["La cantidad de luz en una obra", "La apariencia o cualidad superficial de los materiales", "El tamaño de una figura", "Los colores primarios"], r: 1},
+      {p: "¿Cuáles son los colores primarios?", ops: ["Rojo, azul y amarillo", "Verde, naranja y morado", "Negro, blanco y gris", "Café, rosado y celeste"], r: 0},
+    ]
+  },
+  tecnicas: {
+    ptsCorrecta: 10, ptsPerfecto: 10,
+    preguntas: [
+      {p: "¿Qué técnica consiste en recortar y pegar trozos de papel o tela sobre una superficie?", ops: ["Acuarela", "Collage", "Escultura", "Grabado"], r: 1},
+      {p: "La ACUARELA es una técnica que utiliza:", ops: ["Crayones y cera", "Pigmentos solubles en agua", "Arcilla y yeso", "Tinta china sin agua"], r: 1},
+      {p: "¿Cuál es la diferencia principal entre dibujo y pintura?", ops: ["No hay diferencia", "El dibujo usa líneas; la pintura usa color y pigmentos", "La pintura solo usa lápiz", "El dibujo solo se hace en computadora"], r: 1},
+      {p: "El MODELADO trabaja con:", ops: ["Pincel y lienzo", "Materiales maleables como arcilla o plastilina", "Tijeras y pegamento", "Cámara fotográfica"], r: 1},
+      {p: "¿Qué técnica usa cera de colores para crear imágenes sobre papel?", ops: ["Acuarela", "Tempera", "Crayola / Crayón", "Carboncillo"], r: 2},
+    ]
+  },
+  sonido: {
+    ptsCorrecta: 10, ptsPerfecto: 10,
+    preguntas: [
+      {p: "¿Cuántas propiedades principales tiene el sonido?", ops: ["2", "3", "4", "5"], r: 2},
+      {p: "La ALTURA del sonido se refiere a:", ops: ["Cuán fuerte o suave es un sonido", "Si un sonido es agudo o grave", "El instrumento que lo produce", "La velocidad del sonido"], r: 1},
+      {p: "¿Cómo llamamos a los sonidos muy fuertes en música?", ops: ["Pianissimo", "Forte", "Andante", "Sostenuto"], r: 1},
+      {p: "El TIMBRE nos permite:", ops: ["Saber si un sonido es largo o corto", "Reconocer el origen de un sonido (instrumento o voz)", "Medir la velocidad del sonido", "Distinguir si hay eco"], r: 1},
+      {p: "¿Qué produce el sonido?", ops: ["La luz del sol", "Las vibraciones de los cuerpos", "El movimiento de los líquidos", "La temperatura del aire"], r: 1},
+    ]
+  },
+  ritmo: {
+    ptsCorrecta: 10, ptsPerfecto: 10,
+    preguntas: [
+      {p: "¿Qué es el RITMO en música?", ops: ["La historia que cuenta una canción", "La organización de sonidos en el tiempo (cortos y largos)", "El tipo de instrumento que se usa", "El volumen de la música"], r: 1},
+      {p: "¿Qué es la MELODÍA?", ops: ["Una sucesión de notas musicales con sentido", "El conjunto de músicos", "El tempo de la música", "El silencio entre dos notas"], r: 0},
+      {p: "¿Cuántas notas musicales principales existen?", ops: ["5", "6", "7", "8"], r: 2},
+      {p: "El COMPÁS sirve para:", ops: ["Indicar el instrumento a usar", "Organizar los tiempos fuertes y débiles del ritmo", "Escribir la letra de la canción", "Indicar el número de músicos"], r: 1},
+      {p: "¿Qué significa TEMPO en música?", ops: ["El volumen de la música", "La velocidad a la que se toca una pieza musical", "El nombre del compositor", "El tipo de instrumento principal"], r: 1},
+    ]
+  },
+  instrumentos: {
+    ptsCorrecta: 10, ptsPerfecto: 10,
+    preguntas: [
+      {p: "¿Cuál es el instrumento más representativo de los Llanos venezolanos?", ops: ["La guitarra", "El cuatro", "El violín", "La flauta"], r: 1},
+      {p: "Las MARACAS pertenecen a la familia de instrumentos de:", ops: ["Viento", "Cuerda", "Percusión", "Teclado"], r: 2},
+      {p: "¿En qué familia se clasifica el ARPA venezolana?", ops: ["Percusión", "Viento-madera", "Cuerda", "Viento-metal"], r: 2},
+      {p: "¿Qué instrumento de percusión de origen africano es muy usado en Venezuela?", ops: ["Tambor", "Clavicémbalo", "Fagot", "Laúd"], r: 0},
+      {p: "¿Cómo se llama el instrumento de fricción típico de la gaita zuliana?", ops: ["La flauta traversa", "El furro", "La trompeta", "El oboe"], r: 1},
+    ]
+  },
+  musicapop: {
+    ptsCorrecta: 10, ptsPerfecto: 10,
+    preguntas: [
+      {p: "¿Cuál es el género musical más representativo de Venezuela?", ops: ["Salsa", "Joropo", "Cumbia", "Reggaeton"], r: 1},
+      {p: "¿A qué región de Venezuela pertenece el joropo llanero?", ops: ["Los Andes", "El Oriente", "Los Llanos", "La Costa"], r: 2},
+      {p: "La GAITA es un género musical típico de:", ops: ["Caracas", "Los Andes", "El Zulia", "El Amazonas"], r: 2},
+      {p: "¿Cuál de estos ritmos tiene origen afrovenezolano?", ops: ["El vals venezolano", "El joropo", "El tambor de San Juan", "La contradanza"], r: 2},
+      {p: "¿Qué instrumentos forman el conjunto típico del joropo?", ops: ["Piano, bajo y batería", "Arpa, cuatro y maracas", "Guitarra, violín y flauta", "Trompeta, trombón y percusión"], r: 1},
+    ]
+  },
+  teatro: {
+    ptsCorrecta: 10, ptsPerfecto: 10,
+    preguntas: [
+      {p: "¿Cuántos elementos básicos tiene una obra de teatro?", ops: ["1", "2", "Texto, actores y escenario", "5 o más"], r: 2},
+      {p: "¿Cómo se llama el texto escrito de una obra de teatro?", ops: ["Novela", "Guion o libreto", "Poema", "Cuento"], r: 1},
+      {p: "Las ACOTACIONES en un texto teatral son:", ops: ["Los títulos de los actos", "Instrucciones sobre cómo actuar o el escenario", "Los apellidos de los actores", "Las canciones de la obra"], r: 1},
+      {p: "¿Qué es el MONÓLOGO en teatro?", ops: ["Cuando dos personajes hablan al mismo tiempo", "Cuando un personaje habla solo en escena", "La escenografía de la obra", "El último acto de la obra"], r: 1},
+      {p: "¿Cómo se llama la persona que dirige una obra de teatro?", ops: ["El protagonista", "El escenógrafo", "El director", "El guionista"], r: 2},
+    ]
+  },
+  danza: {
+    ptsCorrecta: 10, ptsPerfecto: 10,
+    preguntas: [
+      {p: "¿Qué es la danza?", ops: ["Un tipo de canto", "Movimiento del cuerpo coordinado con la música o el ritmo", "Una técnica de pintura", "Un instrumento musical"], r: 1},
+      {p: "¿Cuál de estas es una danza folklórica venezolana?", ops: ["El flamenco", "El tango", "El joropo", "La salsa"], r: 2},
+      {p: "La EXPRESIÓN CORPORAL se refiere a:", ops: ["Tocar instrumentos musicales", "Comunicar ideas y emociones a través del movimiento del cuerpo", "Hacer dibujos con el cuerpo", "Escribir sobre el cuerpo humano"], r: 1},
+      {p: "¿Qué es la COREOGRAFÍA?", ops: ["La música de un baile", "La secuencia de pasos y movimientos planeados en una danza", "El vestuario de los bailarines", "El escenario del espectáculo"], r: 1},
+      {p: "¿Cómo se llama la celebración cultural venezolana con danza declarada Patrimonio de la Humanidad?", ops: ["Joropo Llanero", "Diablos Danzantes de Yare", "Tamunangue", "Calipso del Callao"], r: 1},
+    ]
+  },
+  artepop: {
+    ptsCorrecta: 10, ptsPerfecto: 10,
+    preguntas: [
+      {p: "¿Qué es el arte popular?", ops: ["Arte hecho solo por artistas famosos", "Expresiones artísticas creadas por comunidades, ligadas a su cultura y tradición", "Arte que solo se vende en museos", "Arte importado de otros países"], r: 1},
+      {p: "¿Cuál de estas es una artesanía típica venezolana?", ops: ["La porcelana china", "El tejido wayuu (chinchorros y mochilas)", "Los tapices persas", "La cerámica japonesa"], r: 1},
+      {p: "La CERÁMICA es una artesanía que trabaja con:", ops: ["Madera", "Arcilla cocida", "Tela y lana", "Semillas y piedras"], r: 1},
+      {p: "¿Qué son las MÁSCARAS en el arte popular venezolano?", ops: ["Adornos para las paredes", "Piezas usadas en celebraciones y rituales culturales", "Instrumentos musicales", "Tipos de tejidos"], r: 1},
+      {p: "¿Cómo se llama el sombrero típico venezolano de los llaneros?", ops: ["Sombrero de copa", "Sombrero pelo e' guama", "Sombrero paisa", "Sombrero de paja toquilla"], r: 1},
+    ]
+  },
+  disenio: {
+    ptsCorrecta: 10, ptsPerfecto: 10,
+    preguntas: [
+      {p: "¿Qué es el DISEÑO GRÁFICO?", ops: ["El arte de esculpir figuras en madera", "La disciplina que combina texto e imágenes para comunicar un mensaje visual", "Una técnica de pintura al óleo", "Un tipo de danza folklórica"], r: 1},
+      {p: "¿Para qué sirven las señales de tránsito?", ops: ["Para decorar las calles", "Para comunicar normas y advertencias a conductores y peatones", "Para indicar dónde hay restaurantes", "Para señalar monumentos históricos"], r: 1},
+      {p: "¿Cuál es el color de las señales de ADVERTENCIA o peligro?", ops: ["Azul", "Verde", "Amarillo", "Blanco"], r: 2},
+      {p: "¿Qué es un SÍMBOLO?", ops: ["Una figura decorativa sin significado", "Una imagen o signo que representa una idea, objeto o concepto", "Una letra del alfabeto", "Un tipo de pintura"], r: 1},
+      {p: "¿Cuál de estos es un símbolo patrio venezolano?", ops: ["La firma del Presidente", "El Escudo Nacional", "El mapa del mundo", "El nombre de Bolívar"], r: 1},
+    ]
+  },
+  patrimonio: {
+    ptsCorrecta: 10, ptsPerfecto: 10,
+    preguntas: [
+      {p: "¿Qué es el PATRIMONIO ARTÍSTICO de un país?", ops: ["Solo las obras de arte en museos privados", "El conjunto de bienes culturales y artísticos heredados de generaciones anteriores", "Los productos que se exportan al extranjero", "Las canciones modernas del país"], r: 1},
+      {p: "¿Cuál es un ejemplo de patrimonio artístico venezolano?", ops: ["La Torre Eiffel", "Las pinturas de Arturo Michelena", "El Coliseo Romano", "Las pirámides de Egipto"], r: 1},
+      {p: "¿Qué institución cuida el patrimonio artístico en Venezuela?", ops: ["El Ministerio de Deportes", "El Ministerio de Cultura", "La Asamblea Nacional", "El Ministerio de Educación"], r: 1},
+      {p: "Los PETROGLIFOS son:", ops: ["Pinturas hechas con acuarela en lienzo", "Grabados o dibujos hechos por indígenas en rocas", "Esculturas de bronce de la época colonial", "Canciones folklóricas venezolanas"], r: 1},
+      {p: "¿Qué significa que algo sea 'Patrimonio de la Humanidad' por la UNESCO?", ops: ["Que se puede vender libremente", "Que tiene valor excepcional y debe protegerse para todas las generaciones", "Que pertenece a un solo país", "Que es muy antiguo pero sin valor actual"], r: 1},
+    ]
+  },
+};
+
+var BLOQUECOLORS = {
+  'Expresion Plastica': '#AD1457',
+  'Educacion Musical':  '#6A1B9A',
+  'Arte Escenico':      '#E65100',
+  'Arte y Cultura':     '#00695C'
+};
+
+function getBloqueColor(bloque) {
+  if (!bloque) return '#AD1457';
+  if (bloque.indexOf('stica') > -1 || bloque.indexOf('Pl') > -1) return '#AD1457';
+  if (bloque.indexOf('usical') > -1 || bloque.indexOf('Musi') > -1) return '#6A1B9A';
+  if (bloque.indexOf('nico') > -1 || bloque.indexOf('Esc') > -1) return '#E65100';
+  if (bloque.indexOf('Arte y C') > -1 || bloque.indexOf('Cultu') > -1) return '#00695C';
+  return '#AD1457';
+}
+
+var currentTopic = null;
+
+// Abrir todos los bloques
+document.querySelectorAll('.bloque-items').forEach(function(el) {
+  el.style.maxHeight = el.scrollHeight + 'px';
+});
+
+function toggleBloque(id) {
+  var el  = document.getElementById('bloque-' + id);
+  var hdr = el.previousElementSibling;
+  if (el.classList.contains('collapsed')) {
+    el.classList.remove('collapsed');
+    hdr.classList.remove('collapsed');
+    el.style.maxHeight = el.scrollHeight + 'px';
+  } else {
+    el.classList.add('collapsed');
+    hdr.classList.add('collapsed');
+    el.style.maxHeight = '0';
+  }
+}
+
+function selectTopic(key) {
+  currentTopic = key;
+  document.querySelectorAll('.topic-item').forEach(function(e) {
+    e.classList.remove('active');
+  });
+  var item = document.getElementById('item-' + key);
+  if (item) item.classList.add('active');
+  if (window.innerWidth <= 700) {
+    document.getElementById('sidebar').classList.remove('open');
+    document.getElementById('sidebarOverlay').classList.remove('open');
+    document.body.style.overflow = '';
+  }
+  renderPanel(key);
+}
+
+function renderPanel(key) {
+  var t      = TOPICS[key];
+  if (!t) { return; }
+  var libros = LIBROS[key] || [];
+  var color  = getBloqueColor(t.bloque);
+  var enc    = ENCUESTASALL[key];
+  var tieneEnc = enc ? true : false;
+
+  var html = '<div class="topic-panel">';
+  html += '<div class="topic-header">';
+  html += '<div class="topic-emoji">' + t.emoji + '</div>';
+  html += '<div class="topic-info">';
+  html += '<h1>' + t.title + '</h1>';
+  html += '<p>' + t.bloque + ' &middot; ' + libros.length + ' libro' + (libros.length !== 1 ? 's' : '') + ' disponible' + (libros.length !== 1 ? 's' : '') + '</p>';
+  html += '</div></div>';
+
+  html += '<div class="tabs">';
+  html += '<button class="tab active" id="tab-btn-libros" onclick="switchTab(\'libros\',this)">&#128218; Libros</button>';
+  html += '<button class="tab" id="tab-btn-videos" onclick="switchTab(\'videos\',this)">&#127909; Videos</button>';
+  if (tieneEnc) {
+    html += '<button class="tab" id="tab-btn-encuesta" onclick="switchTab(\'encuesta\',this)">&#128221; Encuesta</button>';
+  }
+  html += '</div>';
+
+  html += '<div id="tab-libros">' + buildLibros(libros, color) + '</div>';
+
+  html += '<div id="tab-videos" style="display:none">';
+  html += '<div class="video-placeholder">';
+  html += '<div class="icon">&#127909;</div>';
+  html += '<h3>En desarrollo &ndash; Pr&oacute;ximamente</h3>';
+  html += '<p>Los videos de este tema estar&aacute;n disponibles pronto.</p>';
+  html += '</div></div>';
+
+  if (tieneEnc) {
+    html += '<div id="tab-encuesta" style="display:none"></div>';
+  }
+
+  html += '</div>';
+
+  document.getElementById('content').innerHTML = html;
+}
+
+function buildLibros(libros, color) {
+  if (!libros || libros.length === 0) {
+    return '<p style="color:#999;padding:20px">No hay libros disponibles aún.</p>';
+  }
+  var html = '<div class="books-grid">';
+  for (var i = 0; i < libros.length; i++) {
+    var b = libros[i];
+    var safeTitle  = (b.title  || '').replace(/'/g, '\'');
+    var safeUrl    = (b.url    || '').replace(/'/g, '%27');
+    html += '<div class="book-card">';
+    html += '<div class="book-icon">' + (b.icon || '&#128218;') + '</div>';
+    html += '<div class="book-title">'  + (b.title  || '') + '</div>';
+    html += '<div class="book-author">' + (b.author || '') + '</div>';
+    html += '<span class="book-pts">' + (b.pts || 0) + ' pts</span>';
+    html += '<button class="book-btn" data-url="' + safeUrl + '" data-title="' + safeTitle + '" onclick="openBook(this.dataset.url,this.dataset.title)">&#128214; Abrir libro</button>';
+    html += '</div>';
+  }
+  html += '</div>';
+  return html;
+}
+
+function openBook(url, title) {
+  var params = 'url=' + encodeURIComponent(url) + '&title=' + encodeURIComponent(title);
+  window.open('lector.html?' + params, '_blank');
+}
+
+function switchTab(tab, el) {
+  document.querySelectorAll('.tab').forEach(function(t) { t.classList.remove('active'); });
+  el.classList.add('active');
+  var tl = document.getElementById('tab-libros');
+  var tv = document.getElementById('tab-videos');
+  var te = document.getElementById('tab-encuesta');
+  if (tl) tl.style.display = (tab === 'libros')  ? '' : 'none';
+  if (tv) tv.style.display = (tab === 'videos')  ? '' : 'none';
+  if (te) {
+    te.style.display = (tab === 'encuesta') ? '' : 'none';
+    if (tab === 'encuesta' && !te.dataset.loaded) {
+      te.innerHTML = renderEncuesta(currentTopic);
+      te.dataset.loaded = '1';
+    }
+  }
+}
+
+/* ══ ENCUESTA / QUIZ ══ */
+function getLog() {
+  try { return JSON.parse(localStorage.getItem('encuestasLog') || '{}'); } catch(e) { return {}; }
+}
+function saveLog(log) {
+  try { localStorage.setItem('encuestasLog', JSON.stringify(log)); } catch(e) {}
+}
+function marcarEncuesta(id, pts, aprobado) {
+  var log = getLog();
+  log[id] = { pts: pts, aprobado: aprobado, fecha: new Date().toISOString() };
+  saveLog(log);
+}
+function sumarPuntos(pts) {
+  try {
+    var s = JSON.parse(localStorage.getItem('biblioSesion') || 'null');
+    if (!s) return;
+    s.puntos = (s.puntos || 0) + pts;
+    localStorage.setItem('biblioSesion', JSON.stringify(s));
+    if (typeof window.refreshBadge === 'function') window.refreshBadge();
+  } catch(e) {}
+}
+function getPts() {
+  try { return JSON.parse(localStorage.getItem('biblioSesion') || '{}').puntos || 0; } catch(e) { return 0; }
+}
+
+function renderEncuesta(topicId) {
+  var enc = ENCUESTASALL[topicId];
+  if (!enc) return '<p style="color:#aaa;padding:20px">No hay encuesta para este tema.</p>';
+  var log   = getLog();
+  var entry = log[topicId];
+  var maxPts = enc.preguntas.length * enc.ptsCorrecta + enc.ptsPerfecto;
+
+  if (entry && entry.aprobado) {
+    return '<div class="enc-wrap"><div class="enc-status"><span class="enc-icon">&#9989;</span>' +
+      '<div class="enc-txt"><strong>&#161;Ya completaste esta encuesta!</strong><br>' +
+      '<span class="enc-pts">' + entry.pts + ' puntos ganados</span></div></div>' +
+      '<div class="quiz-result"><span class="res-emoji">&#127942;</span>' +
+      '<h3>Encuesta completada</h3>' +
+      '<p>Vuelve a leer el tema para reforzar lo aprendido.</p></div></div>';
+  }
+
+  if (entry && !entry.aprobado) {
+    var ahora = Date.now();
+    var diff  = ahora - new Date(entry.fecha).getTime();
+    var ESPERA = 12 * 3600 * 1000;
+    if (diff < ESPERA) {
+      var rest = ESPERA - diff;
+      var hh = Math.floor(rest / 3600000);
+      var mm = Math.floor((rest % 3600000) / 60000);
+      return '<div class="enc-wrap"><div class="enc-status err">' +
+        '<span class="enc-icon">&#9203;</span>' +
+        '<div class="enc-txt"><strong>Intento no aprobado</strong><br>' +
+        '<span class="enc-pts" style="color:#c62828">Podrás reintentar en ' + hh + 'h ' + mm + 'min</span>' +
+        '</div></div></div>';
+    }
+  }
+
+  var retryTxt = (entry && !entry.aprobado)
+    ? '<p style="font-size:.8rem;color:#10b981;margin-bottom:8px">&#161;Ya puedes reintentar!</p>'
+    : '';
+
+  return '<div class="enc-wrap">' +
+    '<div class="enc-status bloq"><span class="enc-icon">&#128221;</span>' +
+    '<div class="enc-txt">&#161;Lee los libros y responde la encuesta!<br>' +
+    '<span class="enc-pts">Hasta ' + maxPts + ' puntos &#127942;</span></div></div><br>' +
+    retryTxt +
+    '<button class="enc-btn" onclick="iniciarQuiz(\'' + topicId + '\')">&#128640; &#161;Iniciar encuesta!</button>' +
+    '</div>';
+}
+
+var QS = null;
+
+function iniciarQuiz(topicId) {
+  var enc = ENCUESTASALL[topicId];
+  if (!enc) return;
+  QS = { topicId: topicId, enc: enc, current: 0, correctas: 0, answered: false };
+  renderPregunta();
+}
+
+function renderPregunta() {
+  var enc = QS.enc;
+  var q   = enc.preguntas[QS.current];
+  var pct = Math.round((QS.current / enc.preguntas.length) * 100);
+  var opts = '';
+  for (var i = 0; i < q.ops.length; i++) {
+    opts += '<button class="quiz-opt" onclick="responder(' + i + ')">' + q.ops[i] + '</button>';
+  }
+  var html = '<div class="enc-wrap"><div class="quiz-wrap">' +
+    '<div class="quiz-progress">' +
+    '<div class="quiz-bar-bg"><div class="quiz-bar" style="width:' + pct + '%"></div></div>' +
+    '<span class="quiz-qnum">Pregunta ' + (QS.current+1) + ' / ' + enc.preguntas.length + '</span>' +
+    '</div>' +
+    '<p class="quiz-q">' + q.p + '</p>' +
+    '<div class="quiz-opts">' + opts + '</div>' +
+    '<div class="quiz-feedback" id="qFB"></div>' +
+    '<button class="quiz-next" id="qNext" onclick="siguiente()">Siguiente &#8250;</button>' +
+    '</div></div>';
+  document.getElementById('tab-encuesta').innerHTML = html;
+}
+
+function responder(idx) {
+  if (QS.answered) return;
+  QS.answered = true;
+  var q    = QS.enc.preguntas[QS.current];
+  var opts = document.querySelectorAll('.quiz-opt');
+  var fb   = document.getElementById('qFB');
+  var nxt  = document.getElementById('qNext');
+  opts.forEach(function(b) { b.disabled = true; });
+  opts[q.r].classList.add('reveal');
+  if (idx === q.r) {
+    QS.correctas++;
+    opts[idx].classList.add('correct');
+    fb.textContent = '&#9989; &#161;Correcto!';
+    fb.innerHTML = '&#9989; &#161;Correcto!';
+    fb.className = 'quiz-feedback show ok';
+  } else {
+    opts[idx].classList.add('wrong');
+    fb.innerHTML = '&#10060; Incorrecto. La respuesta correcta está marcada en verde.';
+    fb.className = 'quiz-feedback show fail';
+  }
+  nxt.className = 'quiz-next show';
+}
+
+function siguiente() {
+  QS.current++;
+  QS.answered = false;
+  if (QS.current < QS.enc.preguntas.length) {
+    renderPregunta();
+  } else {
+    mostrarResultado();
+  }
+}
+
+function mostrarResultado() {
+  var enc      = QS.enc;
+  var aprobado = QS.correctas / enc.preguntas.length >= 0.6;
+  var pts      = QS.correctas * enc.ptsCorrecta;
+  var perfecto = QS.correctas === enc.preguntas.length;
+  var total_pts = pts + (perfecto ? enc.ptsPerfecto : 0);
+  var logPrev  = getLog()[QS.topicId];
+  if (!logPrev || aprobado) {
+    sumarPuntos(total_pts);
+    marcarEncuesta(QS.topicId, total_pts, aprobado);
+  }
+  var total = getPts();
+  var pct   = Math.round((QS.correctas / enc.preguntas.length) * 100);
+  var emoji = pct === 100 ? '&#127942;' : pct >= 60 ? '&#11088;' : '&#128218;';
+  var msg   = pct === 100 ? '&#161;Perfecto! Respondiste todo correctamente.'
+    : pct >= 60 ? '&#161;Muy bien! Sigue practicando para mejorar.'
+    : 'Vuelve a leer el tema. Podrás intentarlo de nuevo en <strong>12 horas</strong>.';
+  var bonusTxt = perfecto
+    ? '<p style="color:#f59e0b;font-weight:700">+' + enc.ptsPerfecto + ' puntos BONUS &#127919;</p>' : '';
+  var ptsTxt = aprobado
+    ? '<div class="res-pts">' + total_pts + ' puntos</div>' + bonusTxt
+    : '<div class="res-pts" style="color:#ef4444">0 puntos &ndash; no aprobado</div>';
+
+  var html = '<div class="enc-wrap"><div class="quiz-result">' +
+    '<span class="res-emoji">' + emoji + '</span>' +
+    '<h3>' + QS.correctas + ' / ' + enc.preguntas.length + ' correctas &middot; ' + pct + '%</h3>' +
+    ptsTxt +
+    '<p>' + msg + '</p>';
+  if (aprobado) {
+    html += '<p style="font-size:.8rem;color:#999">Total acumulado: ' + total + ' pts</p>';
+  } else {
+    html += '<button class="enc-btn" style="margin-top:8px" onclick="volverEncuesta()">&#8592; Volver</button>';
+  }
+  html += '</div></div>';
+  document.getElementById('tab-encuesta').innerHTML = html;
+  if (typeof window.refreshBadge === 'function') window.refreshBadge();
+}
+
+function volverEncuesta() {
+  var el = document.getElementById('tab-encuesta');
+  if (el) { el.innerHTML = renderEncuesta(currentTopic); }
+}
+
+/* ══ TEMA OSCURO ══ */
+function applyTheme(dark) {
+  document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light');
+  document.getElementById('themeBtn').innerHTML = dark ? '☀️' : '🌙';
+  try { localStorage.setItem('biblioTheme', dark ? 'dark' : 'light'); } catch(e) {}
+}
+(function() {
+  var saved = '';
+  try { saved = localStorage.getItem('biblioTheme') || ''; } catch(e) {}
+  applyTheme(saved === 'dark');
+})();
+function toggleTheme() {
+  applyTheme(document.documentElement.getAttribute('data-theme') !== 'dark');
+}
+
+/* ══ SIDEBAR MÓVIL ══ */
+function toggleSidebar() {
+  var s = document.getElementById('sidebar');
+  var o = document.getElementById('sidebarOverlay');
+  s.classList.toggle('open');
+  o.classList.toggle('open');
+  document.body.style.overflow = s.classList.contains('open') ? 'hidden' : '';
+}
+
+/* ══ BURBUJA DE SESIÓN ══ */
+(function() {
+  var sesion = null;
+  try {
+    var raw = localStorage.getItem('biblioSesion');
+    if (raw) sesion = JSON.parse(raw);
+  } catch(e) {}
+  if (!sesion) sesion = { nombre: 'Estudiante', puntos: 0 };
+
+  var badge = document.createElement('div');
+  badge.id = 'sessionBadge';
+  badge.style.cssText = 'position:fixed;bottom:16px;right:16px;z-index:9999;' +
+    'background:var(--surface2,#fff);border:1px solid var(--border,#ddd);' +
+    'border-radius:50px;padding:8px 14px;display:flex;align-items:center;gap:8px;' +
+    'box-shadow:0 4px 16px rgba(0,0,0,.18);font-family:Satoshi,sans-serif;' +
+    'font-size:.8rem;color:var(--text,#1a1a1a)';
+  badge.innerHTML =
+    '<span style="font-size:1.1rem">&#127891;</span>' +
+    '<span><strong>' + sesion.nombre + '</strong><br>' +
+    '<span style="color:#c2185b;font-weight:700">&#11088; <span id="badgePts">' + (sesion.puntos||0) + '</span> pts</span>' +
+    '</span>' +
+    '<span onclick="cerrarSesion()" title="Cerrar sesión" style="cursor:pointer;opacity:.5;font-size:16px;margin-left:4px">&#215;</span>';
+  document.body.appendChild(badge);
+
+  window.refreshBadge = function() {
+    try {
+      var s2 = JSON.parse(localStorage.getItem('biblioSesion') || '{}');
+      var el = document.getElementById('badgePts');
+      if (el) el.textContent = s2.puntos || 0;
+    } catch(e) {}
+  };
+  window.cerrarSesion = function() {
+    if (confirm('\u00bfCerrar sesi\u00f3n?')) {
+      try { localStorage.removeItem('biblioSesion'); } catch(e) {}
+      window.location.href = 'login.html';
+    }
+  };
+})();
+</script>
+</body>
+</html>

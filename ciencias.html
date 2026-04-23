@@ -1,0 +1,999 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Ciencias Naturales 4º Grado – BiblioMara</title>
+<link href="https://api.fontshare.com/v2/css?f[]=satoshi@400,500,700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --blue:#1565C0;--orange:#E65100;--green:#2E7D32;--purple:#6A1B9A;
+  --surface:#f7f6f2;--surface2:#fff;--text:#1a1a1a;--muted:#666;
+  --border:#e0e0e0;--sidebar-bg:#fff;--header-bg:linear-gradient(135deg,#1565C0,#283593);
+  --card-bg:#fff;--tab-bg:#f0f0f0;--tab-active:#fff;
+  --topic-hover:#f5f5f5;--topic-active:#E3F2FD;--topic-active-text:#1565C0;
+  --radius:10px;--shadow:0 2px 12px rgba(0,0,0,.1);
+  --font:'Satoshi',sans-serif;
+  --transition:.22s;
+}
+[data-theme="dark"]{
+  --surface:#0f0f1a;--surface2:#1a1a2e;--text:#e8e8f0;--muted:#8a8ab0;
+  --border:#2a2a45;--sidebar-bg:#16162a;--card-bg:#1e1e35;
+  --tab-bg:#1e1e35;--tab-active:#2a2a50;
+  --topic-hover:#1e1e35;--topic-active:#1e3a5f;--topic-active-text:#90CAF9;
+  --shadow:0 2px 14px rgba(0,0,0,.4);
+}
+body{font-family:var(--font);background:var(--surface);color:var(--text);display:flex;flex-direction:column;min-height:100vh;transition:background var(--transition),color var(--transition)}
+
+/* ── HEADER ── */
+.header{background:var(--header-bg);color:#fff;padding:12px 20px;display:flex;align-items:center;gap:12px;box-shadow:0 2px 8px rgba(0,0,0,.3);flex-shrink:0;min-height:60px}
+.header svg{flex-shrink:0}
+.header-title{font-size:1.15rem;font-weight:700;line-height:1.2}
+.header-sub{font-size:.78rem;opacity:.8}
+.header-right{margin-left:auto;display:flex;align-items:center;gap:8px}
+.back-btn{background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.35);color:#fff;padding:7px 14px;border-radius:20px;cursor:pointer;font-size:.82rem;transition:.2s;white-space:nowrap}
+.back-btn:hover{background:rgba(255,255,255,.32)}
+/* Hamburger */
+.hamburger{display:none;flex-direction:column;gap:5px;cursor:pointer;background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.3);padding:8px 10px;border-radius:10px}
+.hamburger span{display:block;width:20px;height:2px;background:#fff;border-radius:2px;transition:.3s}
+/* Tema toggle */
+.theme-btn{background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.3);color:#fff;width:36px;height:36px;border-radius:50%;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;transition:.2s;flex-shrink:0}
+.theme-btn:hover{background:rgba(255,255,255,.28)}
+
+/* ── LAYOUT ── */
+.main{display:flex;flex:1;overflow:hidden;height:calc(100vh - 60px)}
+
+/* ── SIDEBAR ── */
+.sidebar{width:255px;flex-shrink:0;background:var(--sidebar-bg);border-right:1px solid var(--border);overflow-y:auto;padding-bottom:24px;transition:background var(--transition),transform var(--transition)}
+.sidebar-title{padding:13px 16px;font-weight:700;font-size:.8rem;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;border-bottom:1px solid var(--border)}
+.bloque-header{padding:11px 16px;font-weight:700;font-size:.82rem;color:#fff;cursor:pointer;display:flex;align-items:center;gap:6px;user-select:none;transition:.15s}
+.bloque-header:hover{filter:brightness(.9)}
+.bloque-header .chev{margin-left:auto;transition:transform .25s;font-style:normal}
+.bloque-header.collapsed .chev{transform:rotate(-90deg)}
+.bloque-items{overflow:hidden;transition:max-height .32s ease}
+.bloque-items.collapsed{max-height:0!important}
+.topic-item{padding:10px 16px 10px 28px;font-size:.84rem;cursor:pointer;border-left:3px solid transparent;transition:.15s;color:var(--text)}
+.topic-item:hover{background:var(--topic-hover);border-left-color:#90CAF9}
+.topic-item.active{background:var(--topic-active);border-left-color:#1565C0;color:var(--topic-active-text);font-weight:600}
+
+/* Overlay móvil */
+.sidebar-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:40;backdrop-filter:blur(2px)}
+
+/* ── CONTENT ── */
+.content{flex:1;overflow-y:auto;padding:22px}
+.welcome{text-align:center;padding:60px 20px;color:var(--muted)}
+.welcome .big{font-size:3.8rem;margin-bottom:12px}
+.welcome h2{font-size:1.3rem;color:var(--text);margin-bottom:8px}
+
+/* ── TOPIC PANEL ── */
+.topic-panel{max-width:860px}
+.topic-header{display:flex;align-items:center;gap:14px;margin-bottom:18px;padding-bottom:14px;border-bottom:2px solid var(--border)}
+.topic-emoji{font-size:2.4rem}
+.topic-info h1{font-size:1.35rem;font-weight:700}
+.topic-info p{color:var(--muted);font-size:.88rem;margin-top:2px}
+
+/* ── TABS ── */
+.tabs{display:flex;gap:4px;margin-bottom:18px;background:var(--tab-bg);padding:4px;border-radius:10px}
+.tab{padding:8px 18px;border-radius:7px;cursor:pointer;font-size:.88rem;font-weight:500;transition:.2s;color:var(--muted)}
+.tab.active{background:var(--tab-active);color:#1565C0;box-shadow:0 1px 4px rgba(0,0,0,.12)}
+
+/* ── BOOK CARDS ── */
+.books-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:14px}
+.book-card{background:var(--card-bg);border-radius:var(--radius);padding:18px;box-shadow:var(--shadow);cursor:pointer;transition:.2s;border:2px solid transparent;display:flex;flex-direction:column;gap:8px}
+.book-card:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(0,0,0,.16);border-color:#1565C0}
+.book-icon{font-size:2rem}
+.book-title{font-weight:700;font-size:.93rem;line-height:1.3;color:var(--text)}
+.book-author{font-size:.78rem;color:var(--muted)}
+.book-pts{display:inline-block;background:var(--topic-active);color:#1565C0;padding:3px 10px;border-radius:20px;font-size:.76rem;font-weight:600}
+.book-btn{margin-top:auto;padding:10px;background:#1565C0;color:#fff;border:none;border-radius:8px;cursor:pointer;font-size:.84rem;font-weight:600;transition:.2s}
+.book-btn:hover{background:#0D47A1}
+
+/* VIDEO */
+.video-placeholder{text-align:center;padding:50px 20px;background:var(--card-bg);border-radius:var(--radius);box-shadow:var(--shadow);color:var(--muted)}
+.video-placeholder .icon{font-size:3rem;margin-bottom:10px}
+.video-placeholder h3{color:var(--text);font-size:1rem;margin-bottom:6px}
+
+/* ── RESPONSIVE MÓVIL ── */
+@media(max-width:700px){
+  .hamburger{display:flex}
+  .header-title{font-size:1rem}
+  .back-btn span{display:none}
+  .sidebar{
+    position:fixed;left:0;top:0;height:100%;z-index:50;
+    transform:translateX(-100%);width:78%;max-width:300px;
+    box-shadow:4px 0 24px rgba(0,0,0,.3);
+  }
+  .sidebar.open{transform:translateX(0)}
+  .sidebar-overlay.open{display:block}
+  .main{flex-direction:column;height:calc(100vh - 60px)}
+  .content{padding:14px}
+  .books-grid{grid-template-columns:1fr}
+  .topic-header{flex-direction:column;align-items:flex-start;gap:8px}
+  .topic-emoji{font-size:2rem}
+  .topic-info h1{font-size:1.15rem}
+  .tabs{overflow-x:auto;-webkit-overflow-scrolling:touch}
+  .tab{white-space:nowrap;padding:8px 14px;font-size:.82rem}
+  .book-card{padding:14px}
+  .book-btn{padding:12px;font-size:.9rem}
+}
+
+/* ── ENCUESTA ─────────────────────────────────── */
+.enc-wrap{max-width:580px;margin:0 auto}
+.enc-status{
+  display:flex;align-items:center;gap:10px;
+  background:#e8f5e9;border:1.5px solid #a5d6a7;
+  border-radius:12px;padding:14px 18px;margin-bottom:16px;
+}
+.enc-status.bloq{background:#fff3e0;border-color:#ffcc80}
+.enc-status .enc-icon{font-size:1.6rem}
+.enc-status .enc-txt{font-size:.88rem;color:#333;line-height:1.5}
+.enc-status .enc-pts{font-weight:700;color:#2e7d32;font-size:1rem}
+.enc-status.bloq .enc-pts{color:#e65100}
+.enc-btn{
+  display:inline-flex;align-items:center;gap:7px;
+  background:linear-gradient(135deg,#1976d2,#1565c0);
+  color:#fff;border:none;border-radius:10px;
+  padding:11px 22px;font-size:.9rem;font-weight:700;cursor:pointer;
+  transition:.2s;font-family:inherit;
+}
+.enc-btn:hover{transform:translateY(-2px);box-shadow:0 4px 14px rgba(25,118,210,.35)}
+.enc-btn.done{background:linear-gradient(135deg,#2e7d32,#1b5e20);cursor:default}
+.enc-btn.done:hover{transform:none;box-shadow:none}
+/* Quiz */
+.quiz-wrap{background:#fff;border-radius:14px;box-shadow:0 2px 12px rgba(0,0,0,.08);padding:22px}
+.quiz-progress{
+  display:flex;align-items:center;gap:10px;margin-bottom:18px;
+}
+.quiz-bar-bg{flex:1;height:8px;background:#e0e0e0;border-radius:4px;overflow:hidden}
+.quiz-bar{height:100%;background:linear-gradient(90deg,#1976d2,#42a5f5);border-radius:4px;transition:.4s}
+.quiz-qnum{font-size:.78rem;color:#888;white-space:nowrap}
+.quiz-q{font-size:1rem;font-weight:700;color:#1a1a1a;margin-bottom:16px;line-height:1.5}
+.quiz-opts{display:flex;flex-direction:column;gap:9px;margin-bottom:20px}
+.quiz-opt{
+  padding:12px 16px;border-radius:10px;border:2px solid #e0e0e0;
+  background:#fafafa;cursor:pointer;font-size:.9rem;
+  transition:.18s;text-align:left;font-family:inherit;color:#1a1a1a;
+}
+.quiz-opt:hover{border-color:#1976d2;background:#e3f2fd}
+.quiz-opt.correct{border-color:#2e7d32;background:#e8f5e9;color:#1b5e20;font-weight:700}
+.quiz-opt.wrong{border-color:#c62828;background:#ffebee;color:#b71c1c;font-weight:700}
+.quiz-opt.reveal{border-color:#2e7d32;background:#e8f5e9;color:#1b5e20}
+.quiz-opt:disabled{cursor:default}
+.quiz-feedback{
+  min-height:28px;font-size:.85rem;font-weight:600;
+  margin-bottom:14px;padding:8px 12px;border-radius:8px;
+  display:none;
+}
+.quiz-feedback.show{display:block}
+.quiz-feedback.ok{background:#e8f5e9;color:#2e7d32}
+.quiz-feedback.fail{background:#ffebee;color:#c62828}
+.quiz-next{
+  padding:10px 24px;background:#1976d2;color:#fff;border:none;
+  border-radius:9px;cursor:pointer;font-size:.9rem;font-weight:700;
+  font-family:inherit;transition:.2s;display:none;
+}
+.quiz-next.show{display:inline-flex;align-items:center;gap:6px}
+.quiz-next:hover{background:#1565c0}
+/* Resultado final */
+.quiz-result{text-align:center;padding:28px 16px}
+.quiz-result .res-emoji{font-size:3.5rem;display:block;margin-bottom:12px}
+.quiz-result h3{font-size:1.3rem;font-weight:700;margin-bottom:6px}
+.quiz-result .res-pts{
+  font-size:1.6rem;font-weight:900;color:#1976d2;
+  background:#e3f2fd;border-radius:12px;padding:10px 24px;
+  display:inline-block;margin:12px 0;
+}
+.quiz-result p{font-size:.88rem;color:#666;margin-bottom:18px}
+.quiz-result .enc-btn{margin:0 auto}
+
+</style>
+</head>
+<body>
+<header class="header">
+  <button class="hamburger" id="hamburgerBtn" aria-label="Menú" onclick="toggleSidebar()">
+    <span></span><span></span><span></span>
+  </button>
+  <svg width="34" height="34" viewBox="0 0 36 36" fill="none">
+    <rect width="36" height="36" rx="8" fill="white" fill-opacity="0.2"/>
+    <text x="18" y="25" text-anchor="middle" font-size="20" fill="white">🌿</text>
+  </svg>
+  <div>
+    <div class="header-title">Ciencias Naturales – 4º Grado</div>
+    <div class="header-sub">BiblioMara · UEP Instituto Mara</div>
+  </div>
+  <div class="header-right">
+    <button class="theme-btn" id="themeBtn" onclick="toggleTheme()" title="Cambiar tema">🌙</button>
+    <button class="back-btn" onclick="window.location.href='biblioteca.html'">← <span>Inicio</span></button>
+  </div>
+</header>
+
+<div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+<div class="main">
+  <nav class="sidebar">
+    <div class="sidebar-title">🌿 Temas</div>
+<div class="bloque-section">
+  <div class="bloque-header" style="background:#2E7D32" onclick="toggleBloque('b1')">
+    🌿 Seres Vivos <em class="chev">›</em>
+  </div>
+  <div class="bloque-items" id="bloque-b1">
+    <div class="topic-item" id="item-cuerpo" onclick="selectTopic('cuerpo')">🫀 El Cuerpo Humano</div>
+    <div class="topic-item" id="item-sentidos" onclick="selectTopic('sentidos')">👁️ Los Cinco Sentidos</div>
+    <div class="topic-item" id="item-plantas" onclick="selectTopic('plantas')">🌸 Las Plantas</div>
+    <div class="topic-item" id="item-animales" onclick="selectTopic('animales')">🦁 Los Animales</div>
+    <div class="topic-item" id="item-ecosist" onclick="selectTopic('ecosist')">🌍 Ecosistemas</div>
+    <div class="topic-item" id="item-reprod" onclick="selectTopic('reprod')">🌱 Reproducción de Seres Vivos</div>
+  </div>
+</div>
+<div class="bloque-section">
+  <div class="bloque-header" style="background:#1565C0" onclick="toggleBloque('b2')">
+    🌍 El Ambiente <em class="chev">›</em>
+  </div>
+  <div class="bloque-items" id="bloque-b2">
+    <div class="topic-item" id="item-agua" onclick="selectTopic('agua')">💧 El Agua</div>
+    <div class="topic-item" id="item-aire" onclick="selectTopic('aire')">💨 El Aire</div>
+    <div class="topic-item" id="item-suelo" onclick="selectTopic('suelo')">🪨 El Suelo</div>
+    <div class="topic-item" id="item-biodiven" onclick="selectTopic('biodiven')">🦜 Biodiversidad Venezolana</div>
+    <div class="topic-item" id="item-contam" onclick="selectTopic('contam')">♻️ Contaminación Ambiental</div>
+    <div class="topic-item" id="item-climacam" onclick="selectTopic('climacam')">🌡️ Cambio Climático</div>
+  </div>
+</div>
+<div class="bloque-section">
+  <div class="bloque-header" style="background:#E65100" onclick="toggleBloque('b3')">
+    ⚡ Energía y Materia <em class="chev">›</em>
+  </div>
+  <div class="bloque-items" id="bloque-b3">
+    <div class="topic-item" id="item-materia" onclick="selectTopic('materia')">⚗️ La Materia</div>
+    <div class="topic-item" id="item-cammat" onclick="selectTopic('cammat')">🔥 Cambios de la Materia</div>
+    <div class="topic-item" id="item-luzsom" onclick="selectTopic('luzsom')">💡 La Luz y la Sombra</div>
+    <div class="topic-item" id="item-sonido" onclick="selectTopic('sonido')">🔊 El Sonido</div>
+    <div class="topic-item" id="item-petroven" onclick="selectTopic('petroven')">🛢️ El Petróleo Venezolano</div>
+    <div class="topic-item" id="item-fuentener" onclick="selectTopic('fuentener')">☀️ Fuentes de Energía</div>
+    <div class="topic-item" id="item-maqsimp" onclick="selectTopic('maqsimp')">⚙️ Máquinas Simples</div>
+  </div>
+</div>
+<div class="bloque-section">
+  <div class="bloque-header" style="background:#4A148C" onclick="toggleBloque('b4')">
+    🌌 La Tierra en el Universo <em class="chev">›</em>
+  </div>
+  <div class="bloque-items" id="bloque-b4">
+    <div class="topic-item" id="item-tierra" onclick="selectTopic('tierra')">🌍 La Tierra</div>
+    <div class="topic-item" id="item-atmosfera" onclick="selectTopic('atmosfera')">🌩️ La Atmósfera y el Clima</div>
+    <div class="topic-item" id="item-movtie" onclick="selectTopic('movtie')">🔄 Movimientos de la Tierra</div>
+    <div class="topic-item" id="item-luna" onclick="selectTopic('luna')">🌙 La Luna</div>
+    <div class="topic-item" id="item-sistemsol" onclick="selectTopic('sistemsol')">🪐 El Sistema Solar</div>
+  </div>
+</div>
+<div class="bloque-section">
+  <div class="bloque-header" style="background:#B71C1C" onclick="toggleBloque('b5')">
+    ❤️ Salud Integral <em class="chev">›</em>
+  </div>
+  <div class="bloque-items" id="bloque-b5">
+    <div class="topic-item" id="item-higiene" onclick="selectTopic('higiene')">🧼 Hábitos de Higiene</div>
+    <div class="topic-item" id="item-alimenta" onclick="selectTopic('alimenta')">🥗 Alimentación Saludable</div>
+    <div class="topic-item" id="item-enfermed" onclick="selectTopic('enfermed')">💊 Enfermedades Comunes</div>
+    <div class="topic-item" id="item-primauxil" onclick="selectTopic('primauxil')">🚑 Primeros Auxilios</div>
+    <div class="topic-item" id="item-huerto" onclick="selectTopic('huerto')">🌻 El Huerto Escolar</div>
+  </div>
+</div>
+<div class="bloque-section">
+  <div class="bloque-header" style="background:#006064" onclick="toggleBloque('b6')">
+    🔬 Ciencia y Tecnología <em class="chev">›</em>
+  </div>
+  <div class="bloque-items" id="bloque-b6">
+    <div class="topic-item" id="item-metcien" onclick="selectTopic('metcien')">🔬 El Método Científico</div>
+    <div class="topic-item" id="item-exper" onclick="selectTopic('exper')">🧪 Experimentos Sencillos</div>
+    <div class="topic-item" id="item-tecnol" onclick="selectTopic('tecnol')">🤖 Tecnología en la Vida Diaria</div>
+  </div>
+</div>
+  </nav>
+  <main class="content" id="content">
+    <div class="welcome">
+      <div class="big">🌿</div>
+      <h2>¡Bienvenido a Ciencias Naturales!</h2>
+      <p>Selecciona un tema del menú lateral para ver los libros disponibles.</p>
+      <p style="margin-top:8px;font-size:.85rem;color:var(--muted)">6 bloques · 32 temas · 42 libros</p>
+    </div>
+  </main>
+</div>
+
+<script>
+const TOPICS_MAP = {
+  "cuerpo":{emoji:"🫀",title:"El Cuerpo Humano",sub:"Sistemas y aparatos del cuerpo",bloque:"🌿 Seres Vivos"},
+  "sentidos":{emoji:"👁️",title:"Los Cinco Sentidos",sub:"Vista, o\u00eddo, olfato, gusto y tacto",bloque:"🌿 Seres Vivos"},
+  "plantas":{emoji:"🌸",title:"Las Plantas",sub:"Partes, fotos\u00edntesis y reproducci\u00f3n",bloque:"🌿 Seres Vivos"},
+  "animales":{emoji:"🦁",title:"Los Animales",sub:"Vertebrados, invertebrados y h\u00e1bitats",bloque:"🌿 Seres Vivos"},
+  "ecosist":{emoji:"🌍",title:"Ecosistemas",sub:"Cadenas alimentarias y biodiversidad",bloque:"🌿 Seres Vivos"},
+  "reprod":{emoji:"🌱",title:"Reproducci\u00f3n de Seres Vivos",sub:"C\u00f3mo se reproducen plantas y animales",bloque:"🌿 Seres Vivos"},
+  "agua":{emoji:"💧",title:"El Agua",sub:"Ciclo del agua, propiedades e importancia",bloque:"🌍 El Ambiente"},
+  "aire":{emoji:"💨",title:"El Aire",sub:"Composici\u00f3n, importancia y contaminaci\u00f3n",bloque:"🌍 El Ambiente"},
+  "suelo":{emoji:"🪨",title:"El Suelo",sub:"Tipos, capas e importancia para la vida",bloque:"🌍 El Ambiente"},
+  "biodiven":{emoji:"🦜",title:"Biodiversidad Venezolana",sub:"Flora y fauna de Venezuela",bloque:"🌍 El Ambiente"},
+  "contam":{emoji:"♻️",title:"Contaminaci\u00f3n Ambiental",sub:"Causas, efectos y soluciones",bloque:"🌍 El Ambiente"},
+  "climacam":{emoji:"🌡️",title:"Cambio Clim\u00e1tico",sub:"Efecto invernadero y calentamiento global",bloque:"🌍 El Ambiente"},
+  "materia":{emoji:"⚗️",title:"La Materia",sub:"S\u00f3lidos, l\u00edquidos y gases",bloque:"⚡ Energía y Materia"},
+  "cammat":{emoji:"🔥",title:"Cambios de la Materia",sub:"Fusi\u00f3n, evaporaci\u00f3n y solidificaci\u00f3n",bloque:"⚡ Energía y Materia"},
+  "luzsom":{emoji:"💡",title:"La Luz y la Sombra",sub:"Reflexi\u00f3n, refracci\u00f3n y colores",bloque:"⚡ Energía y Materia"},
+  "sonido":{emoji:"🔊",title:"El Sonido",sub:"Vibraci\u00f3n, propagaci\u00f3n y tipos",bloque:"⚡ Energía y Materia"},
+  "petroven":{emoji:"🛢️",title:"El Petr\u00f3leo Venezolano",sub:"Origen, uso y productos derivados",bloque:"⚡ Energía y Materia"},
+  "fuentener":{emoji:"☀️",title:"Fuentes de Energ\u00eda",sub:"Solar, e\u00f3lica, el\u00e9ctrica y ahorro energ\u00e9tico",bloque:"⚡ Energía y Materia"},
+  "maqsimp":{emoji:"⚙️",title:"M\u00e1quinas Simples",sub:"Palanca, rueda, polea y plano inclinado",bloque:"⚡ Energía y Materia"},
+  "tierra":{emoji:"🌍",title:"La Tierra",sub:"Estructura, capas y caracter\u00edsticas",bloque:"🌌 La Tierra en el Universo"},
+  "atmosfera":{emoji:"🌩️",title:"La Atm\u00f3sfera y el Clima",sub:"Lluvia, viento, temperatura y nubes",bloque:"🌌 La Tierra en el Universo"},
+  "movtie":{emoji:"🔄",title:"Movimientos de la Tierra",sub:"Rotaci\u00f3n, traslaci\u00f3n y estaciones",bloque:"🌌 La Tierra en el Universo"},
+  "luna":{emoji:"🌙",title:"La Luna",sub:"Fases lunares y movimientos",bloque:"🌌 La Tierra en el Universo"},
+  "sistemsol":{emoji:"🪐",title:"El Sistema Solar",sub:"Los planetas y el Sol",bloque:"🌌 La Tierra en el Universo"},
+  "higiene":{emoji:"🧼",title:"H\u00e1bitos de Higiene",sub:"Higiene personal y del hogar",bloque:"❤️ Salud Integral"},
+  "alimenta":{emoji:"🥗",title:"Alimentaci\u00f3n Saludable",sub:"Grupos de alimentos y nutrici\u00f3n",bloque:"❤️ Salud Integral"},
+  "enfermed":{emoji:"💊",title:"Enfermedades Comunes",sub:"Prevenci\u00f3n, cuidados y vacunas",bloque:"❤️ Salud Integral"},
+  "primauxil":{emoji:"🚑",title:"Primeros Auxilios",sub:"C\u00f3mo actuar en emergencias b\u00e1sicas",bloque:"❤️ Salud Integral"},
+  "huerto":{emoji:"🌻",title:"El Huerto Escolar",sub:"Cultivar, cuidar y cosechar plantas",bloque:"❤️ Salud Integral"},
+  "metcien":{emoji:"🔬",title:"El M\u00e9todo Cient\u00edfico",sub:"Observar, preguntar, experimentar y concluir",bloque:"🔬 Ciencia y Tecnología"},
+  "exper":{emoji:"🧪",title:"Experimentos Sencillos",sub:"Ciencia en casa y en el aula",bloque:"🔬 Ciencia y Tecnología"},
+  "tecnol":{emoji:"🤖",title:"Tecnolog\u00eda en la Vida Diaria",sub:"Inventos que nos facilitan la vida",bloque:"🔬 Ciencia y Tecnología"},
+};
+
+const BLOQUE_COLORS = {"🌿 Seres Vivos": "#2E7D32", "🌍 El Ambiente": "#1565C0", "⚡ Energía y Materia": "#E65100", "🌌 La Tierra en el Universo": "#4A148C", "❤️ Salud Integral": "#B71C1C", "🔬 Ciencia y Tecnología": "#006064"};
+
+let currentTopic = null;
+let currentTab = 'libros';
+
+// Init: mantener todos los bloques abiertos
+document.addEventListener('DOMContentLoaded', function() {
+  document.querySelectorAll('.bloque-items').forEach(function(el) {
+    el.style.maxHeight = el.scrollHeight + 'px';
+  });
+});
+
+
+const LIBROS = {
+  "cuerpo": [
+    {icon:"📖",title:"Clasificaci\u00f3n de Seres Vivos",author:"Escuela de Maestros BsAs",url:"https://drive.google.com/file/d/1GBWQH5oT5bCfBVasehHeMjzv60QAE8UH/view"},
+    {icon:"📚",title:"Saberes en Red \u2013 Ciencias Naturales 4",author:"Tinta Fresca",url:"https://drive.google.com/file/d/15ugrMQtinU98pHanvKzSt5_ci_r96cVJ/view"},
+    {icon:"🔬",title:"Gu\u00eda CCNN 4\u00b0 \u2013 Webcolegios",author:"Webcolegios",url:"https://drive.google.com/file/d/1NOXBdd_u4msok8rZdpkiTvex-thsvCYw/view"},
+    {icon:"🧬",title:"Caracter\u00edsticas y Clasificaci\u00f3n de los Seres Vivos",author:"ABC Argentina",url:"https://drive.google.com/file/d/1EF4vVlD2RWP2C_p0Xl6TIY17c1VklYHN/view"},
+    {icon:"🔬",title:"Ciencias Naturales 4\u00b0 \u2013 SEP M\u00e9xico",author:"SEP M\u00e9xico",url:"https://drive.google.com/file/d/11aEmrVuNPsAmqbpgB7yTiFmyN0htYDxJ/view"},
+    {icon:"📚",title:"Cuadernos para el Aula \u2013 CCNN 4",author:"BNM Argentina",url:"https://drive.google.com/file/d/18XaFE9k02vGngr9LvPi3dEnBlPlX3IL9/view"},
+    {icon:"🌿",title:"El Peque\u00f1o Gran Mundo de las CCNN",author:"MPPE Venezuela \ud83c\uddfb\ud83c\uddea",url:"https://drive.google.com/file/d/1kgyKk1jQFf151KVn6y07cHtV-S5aPsj3/view"}
+  ],
+  "sentidos": [
+    {icon:"👁️",title:"Cuaderno de Actividades \u2013 Los 5 Sentidos",author:"Museo Ciencia y Agua",url:"https://drive.google.com/file/d/1gtecfXcGWcCmvuyinxSbRnWVlLLijrvg/view"},
+    {icon:"👂",title:"Los Cinco Sentidos \u2013 Gu\u00eda TEA",author:"Texas Education Agency",url:"https://drive.google.com/file/d/1xTD1Tl93v5vaHcxtQnPc-v_f1HwpKJax/view"},
+    {icon:"📚",title:"Saberes en Red \u2013 Ciencias Naturales 4",author:"Tinta Fresca",url:"https://drive.google.com/file/d/15ugrMQtinU98pHanvKzSt5_ci_r96cVJ/view"},
+    {icon:"🔬",title:"Ciencias Naturales 4\u00b0 \u2013 SEP M\u00e9xico",author:"SEP M\u00e9xico",url:"https://drive.google.com/file/d/11aEmrVuNPsAmqbpgB7yTiFmyN0htYDxJ/view"},
+    {icon:"📚",title:"Cuadernos para el Aula \u2013 CCNN 4",author:"BNM Argentina",url:"https://drive.google.com/file/d/18XaFE9k02vGngr9LvPi3dEnBlPlX3IL9/view"},
+    {icon:"🌿",title:"El Peque\u00f1o Gran Mundo de las CCNN",author:"MPPE Venezuela \ud83c\uddfb\ud83c\uddea",url:"https://drive.google.com/file/d/1kgyKk1jQFf151KVn6y07cHtV-S5aPsj3/view"}
+  ],
+  "plantas": [
+    {icon:"🌱",title:"Bot\u00e1nica \u2013 Ciencias Naturales",author:"BNM Argentina",url:"https://drive.google.com/file/d/11S4YIWqkt6rd3LuLPXRoTRI3R1gfhPuf/view"},
+    {icon:"🌿",title:"Clasificaci\u00f3n de Seres Vivos",author:"Escuela de Maestros BsAs",url:"https://drive.google.com/file/d/1GBWQH5oT5bCfBVasehHeMjzv60QAE8UH/view"},
+    {icon:"🧬",title:"Caracter\u00edsticas y Clasificaci\u00f3n de los Seres Vivos",author:"ABC Argentina",url:"https://drive.google.com/file/d/1EF4vVlD2RWP2C_p0Xl6TIY17c1VklYHN/view"},
+    {icon:"🔬",title:"Ciencias Naturales 4\u00b0 \u2013 SEP M\u00e9xico",author:"SEP M\u00e9xico",url:"https://drive.google.com/file/d/11aEmrVuNPsAmqbpgB7yTiFmyN0htYDxJ/view"},
+    {icon:"📚",title:"Cuadernos para el Aula \u2013 CCNN 4",author:"BNM Argentina",url:"https://drive.google.com/file/d/18XaFE9k02vGngr9LvPi3dEnBlPlX3IL9/view"},
+    {icon:"🌿",title:"El Peque\u00f1o Gran Mundo de las CCNN",author:"MPPE Venezuela \ud83c\uddfb\ud83c\uddea",url:"https://drive.google.com/file/d/1kgyKk1jQFf151KVn6y07cHtV-S5aPsj3/view"}
+  ],
+  "animales": [
+    {icon:"🦁",title:"Gu\u00eda CCNN 4\u00b0 \u2013 Webcolegios",author:"Webcolegios",url:"https://drive.google.com/file/d/1NOXBdd_u4msok8rZdpkiTvex-thsvCYw/view"},
+    {icon:"🦜",title:"Energ\u00eda para la Vida \u2013 Tomo I",author:"CCNN Venezuela",url:"https://drive.google.com/file/d/1lcLMPvSVMkgzeP23aBs6r7WMIuN5v-Io/view"},
+    {icon:"📚",title:"Saberes en Red \u2013 Ciencias Naturales 4",author:"Tinta Fresca",url:"https://drive.google.com/file/d/15ugrMQtinU98pHanvKzSt5_ci_r96cVJ/view"},
+    {icon:"🔬",title:"Ciencias Naturales 4\u00b0 \u2013 SEP M\u00e9xico",author:"SEP M\u00e9xico",url:"https://drive.google.com/file/d/11aEmrVuNPsAmqbpgB7yTiFmyN0htYDxJ/view"},
+    {icon:"📚",title:"Cuadernos para el Aula \u2013 CCNN 4",author:"BNM Argentina",url:"https://drive.google.com/file/d/18XaFE9k02vGngr9LvPi3dEnBlPlX3IL9/view"},
+    {icon:"🌿",title:"El Peque\u00f1o Gran Mundo de las CCNN",author:"MPPE Venezuela \ud83c\uddfb\ud83c\uddea",url:"https://drive.google.com/file/d/1kgyKk1jQFf151KVn6y07cHtV-S5aPsj3/view"}
+  ],
+  "ecosist": [
+    {icon:"🌍",title:"Ecolog\u00eda y Ambiente",author:"SINIA Per\u00fa",url:"https://drive.google.com/file/d/1oh8PjZod5yTpJSMaBlJNII4Amfz-EeOR/view"},
+    {icon:"🌿",title:"Ecolog\u00eda y Medio Ambiente",author:"UNA Nicaragua",url:"https://drive.google.com/file/d/16Zjji0P7uZFbptJoBd3U2O1tYaVL1ubB/view"},
+    {icon:"🦋",title:"Gu\u00eda CCNN 4\u00b0 \u2013 Webcolegios",author:"Webcolegios",url:"https://drive.google.com/file/d/1NOXBdd_u4msok8rZdpkiTvex-thsvCYw/view"},
+    {icon:"🔬",title:"Ciencias Naturales 4\u00b0 \u2013 SEP M\u00e9xico",author:"SEP M\u00e9xico",url:"https://drive.google.com/file/d/11aEmrVuNPsAmqbpgB7yTiFmyN0htYDxJ/view"},
+    {icon:"📚",title:"Cuadernos para el Aula \u2013 CCNN 4",author:"BNM Argentina",url:"https://drive.google.com/file/d/18XaFE9k02vGngr9LvPi3dEnBlPlX3IL9/view"},
+    {icon:"🌿",title:"El Peque\u00f1o Gran Mundo de las CCNN",author:"MPPE Venezuela \ud83c\uddfb\ud83c\uddea",url:"https://drive.google.com/file/d/1kgyKk1jQFf151KVn6y07cHtV-S5aPsj3/view"}
+  ],
+  "reprod": [
+    {icon:"🌸",title:"Reproducci\u00f3n de Plantas \u2013 SEP M\u00e9xico",author:"SEP M\u00e9xico",url:"https://drive.google.com/file/d/1S7qEGbQ8LrI8p7mGPhn4VCox5ZjMKHSP/view"},
+    {icon:"🌱",title:"Bot\u00e1nica \u2013 Ciencias Naturales",author:"BNM Argentina",url:"https://drive.google.com/file/d/11S4YIWqkt6rd3LuLPXRoTRI3R1gfhPuf/view"},
+    {icon:"🔄",title:"Energ\u00eda para la Vida \u2013 Tomo I",author:"CCNN Venezuela",url:"https://drive.google.com/file/d/1lcLMPvSVMkgzeP23aBs6r7WMIuN5v-Io/view"},
+    {icon:"🔬",title:"Ciencias Naturales 4\u00b0 \u2013 SEP M\u00e9xico",author:"SEP M\u00e9xico",url:"https://drive.google.com/file/d/11aEmrVuNPsAmqbpgB7yTiFmyN0htYDxJ/view"},
+    {icon:"📚",title:"Cuadernos para el Aula \u2013 CCNN 4",author:"BNM Argentina",url:"https://drive.google.com/file/d/18XaFE9k02vGngr9LvPi3dEnBlPlX3IL9/view"},
+    {icon:"🌿",title:"El Peque\u00f1o Gran Mundo de las CCNN",author:"MPPE Venezuela \ud83c\uddfb\ud83c\uddea",url:"https://drive.google.com/file/d/1kgyKk1jQFf151KVn6y07cHtV-S5aPsj3/view"}
+  ],
+  "agua": [
+    {icon:"💧",title:"El Agua en la Tierra \u2013 Ciclo del Agua",author:"Santillana",url:"https://drive.google.com/file/d/1Uysj1QDKNB-q14U1kZZWvAmOyAzQ6V3P/view"},
+    {icon:"🌊",title:"El Ciclo del Agua para Ni\u00f1os",author:"NASA \ud83d\ude80",url:"https://drive.google.com/file/d/1BMZ5ngxzffZjeGBs8sT_CsEE1Ps7X2eA/view"},
+    {icon:"🌧️",title:"El Ciclo del Agua \u2013 Gu\u00eda Whynauts",author:"Perot Museum",url:"https://drive.google.com/file/d/1LsvKE1W8xn3CVfCtpdi--X43Es_EfxOP/view"},
+    {icon:"🔬",title:"Ciencias Naturales 4\u00b0 \u2013 SEP M\u00e9xico",author:"SEP M\u00e9xico",url:"https://drive.google.com/file/d/11aEmrVuNPsAmqbpgB7yTiFmyN0htYDxJ/view"},
+    {icon:"📚",title:"Cuadernos para el Aula \u2013 CCNN 4",author:"BNM Argentina",url:"https://drive.google.com/file/d/18XaFE9k02vGngr9LvPi3dEnBlPlX3IL9/view"},
+    {icon:"🌿",title:"El Peque\u00f1o Gran Mundo de las CCNN",author:"MPPE Venezuela \ud83c\uddfb\ud83c\uddea",url:"https://drive.google.com/file/d/1kgyKk1jQFf151KVn6y07cHtV-S5aPsj3/view"}
+  ],
+  "aire": [
+    {icon:"💨",title:"El Aire \u2013 Composici\u00f3n y Propiedades",author:"INET Argentina",url:"https://drive.google.com/file/d/1g_pNYjspBig8Raf8hNeZHKmwF6xh47c6/view"},
+    {icon:"🌬️",title:"Meteorolog\u00eda y Climatolog\u00eda",author:"FECYT Espa\u00f1a",url:"https://drive.google.com/file/d/1JU_IwUOi5_5dfgGzY2Uhv0jm030bdvn5/view"},
+    {icon:"🌿",title:"Ecolog\u00eda y Ambiente",author:"SINIA Per\u00fa",url:"https://drive.google.com/file/d/1oh8PjZod5yTpJSMaBlJNII4Amfz-EeOR/view"},
+    {icon:"🔬",title:"Ciencias Naturales 4\u00b0 \u2013 SEP M\u00e9xico",author:"SEP M\u00e9xico",url:"https://drive.google.com/file/d/11aEmrVuNPsAmqbpgB7yTiFmyN0htYDxJ/view"},
+    {icon:"📚",title:"Cuadernos para el Aula \u2013 CCNN 4",author:"BNM Argentina",url:"https://drive.google.com/file/d/18XaFE9k02vGngr9LvPi3dEnBlPlX3IL9/view"},
+    {icon:"🌿",title:"El Peque\u00f1o Gran Mundo de las CCNN",author:"MPPE Venezuela \ud83c\uddfb\ud83c\uddea",url:"https://drive.google.com/file/d/1kgyKk1jQFf151KVn6y07cHtV-S5aPsj3/view"}
+  ],
+  "suelo": [
+    {icon:"🪨",title:"Descripci\u00f3n General de los Suelos",author:"Soils 4 Teachers",url:"https://drive.google.com/file/d/1ymW4GwNUInaP6DMijKPygFdwoVl0wq3T/view"},
+    {icon:"🌱",title:"El Sistema Suelo-Planta",author:"UniR\u00edo Editora",url:"https://drive.google.com/file/d/10BDtPHCwhGdOoc0yrUNuzagyayx1QURg/view"},
+    {icon:"🌍",title:"Ecolog\u00eda y Medio Ambiente",author:"UNA Nicaragua",url:"https://drive.google.com/file/d/16Zjji0P7uZFbptJoBd3U2O1tYaVL1ubB/view"},
+    {icon:"🔬",title:"Ciencias Naturales 4\u00b0 \u2013 SEP M\u00e9xico",author:"SEP M\u00e9xico",url:"https://drive.google.com/file/d/11aEmrVuNPsAmqbpgB7yTiFmyN0htYDxJ/view"},
+    {icon:"📚",title:"Cuadernos para el Aula \u2013 CCNN 4",author:"BNM Argentina",url:"https://drive.google.com/file/d/18XaFE9k02vGngr9LvPi3dEnBlPlX3IL9/view"},
+    {icon:"🌿",title:"El Peque\u00f1o Gran Mundo de las CCNN",author:"MPPE Venezuela \ud83c\uddfb\ud83c\uddea",url:"https://drive.google.com/file/d/1kgyKk1jQFf151KVn6y07cHtV-S5aPsj3/view"}
+  ],
+  "biodiven": [
+    {icon:"🦜",title:"Libro Rojo de la Fauna Venezolana",author:"ICTP / Provita \ud83c\uddfb\ud83c\uddea",url:"https://drive.google.com/file/d/1DWWNGqRl4UiSgTeNqkAzSdL8ZXzPOTMC/view"},
+    {icon:"🐊",title:"Energ\u00eda para la Vida \u2013 Tomo I",author:"CCNN Venezuela \ud83c\uddfb\ud83c\uddea",url:"https://drive.google.com/file/d/1lcLMPvSVMkgzeP23aBs6r7WMIuN5v-Io/view"},
+    {icon:"🌿",title:"Ecolog\u00eda y Ambiente",author:"SINIA Per\u00fa",url:"https://drive.google.com/file/d/1oh8PjZod5yTpJSMaBlJNII4Amfz-EeOR/view"},
+    {icon:"🔬",title:"Ciencias Naturales 4\u00b0 \u2013 SEP M\u00e9xico",author:"SEP M\u00e9xico",url:"https://drive.google.com/file/d/11aEmrVuNPsAmqbpgB7yTiFmyN0htYDxJ/view"},
+    {icon:"📚",title:"Cuadernos para el Aula \u2013 CCNN 4",author:"BNM Argentina",url:"https://drive.google.com/file/d/18XaFE9k02vGngr9LvPi3dEnBlPlX3IL9/view"},
+    {icon:"🌿",title:"El Peque\u00f1o Gran Mundo de las CCNN",author:"MPPE Venezuela \ud83c\uddfb\ud83c\uddea",url:"https://drive.google.com/file/d/1kgyKk1jQFf151KVn6y07cHtV-S5aPsj3/view"}
+  ],
+  "contam": [
+    {icon:"♻️",title:"Ecolog\u00eda y Medio Ambiente",author:"UNA Nicaragua",url:"https://drive.google.com/file/d/16Zjji0P7uZFbptJoBd3U2O1tYaVL1ubB/view"},
+    {icon:"🌍",title:"Ecolog\u00eda y Ambiente",author:"SINIA Per\u00fa",url:"https://drive.google.com/file/d/1oh8PjZod5yTpJSMaBlJNII4Amfz-EeOR/view"},
+    {icon:"🌡️",title:"Causas y Consecuencias del Calentamiento Global",author:"UNLP Argentina",url:"https://drive.google.com/file/d/1SCihk6EcsP8Bzu_zevZDHGgVFBSbb1Y3/view"},
+    {icon:"🔬",title:"Ciencias Naturales 4\u00b0 \u2013 SEP M\u00e9xico",author:"SEP M\u00e9xico",url:"https://drive.google.com/file/d/11aEmrVuNPsAmqbpgB7yTiFmyN0htYDxJ/view"},
+    {icon:"📚",title:"Cuadernos para el Aula \u2013 CCNN 4",author:"BNM Argentina",url:"https://drive.google.com/file/d/18XaFE9k02vGngr9LvPi3dEnBlPlX3IL9/view"},
+    {icon:"🌿",title:"El Peque\u00f1o Gran Mundo de las CCNN",author:"MPPE Venezuela \ud83c\uddfb\ud83c\uddea",url:"https://drive.google.com/file/d/1kgyKk1jQFf151KVn6y07cHtV-S5aPsj3/view"}
+  ],
+  "climacam": [
+    {icon:"🌡️",title:"Causas y Consecuencias del Calentamiento Global",author:"UNLP Argentina",url:"https://drive.google.com/file/d/1SCihk6EcsP8Bzu_zevZDHGgVFBSbb1Y3/view"},
+    {icon:"🌩️",title:"Meteorolog\u00eda y Climatolog\u00eda",author:"FECYT Espa\u00f1a",url:"https://drive.google.com/file/d/1JU_IwUOi5_5dfgGzY2Uhv0jm030bdvn5/view"},
+    {icon:"💨",title:"El Aire \u2013 Composici\u00f3n y Propiedades",author:"INET Argentina",url:"https://drive.google.com/file/d/1g_pNYjspBig8Raf8hNeZHKmwF6xh47c6/view"},
+    {icon:"🔬",title:"Ciencias Naturales 4\u00b0 \u2013 SEP M\u00e9xico",author:"SEP M\u00e9xico",url:"https://drive.google.com/file/d/11aEmrVuNPsAmqbpgB7yTiFmyN0htYDxJ/view"},
+    {icon:"📚",title:"Cuadernos para el Aula \u2013 CCNN 4",author:"BNM Argentina",url:"https://drive.google.com/file/d/18XaFE9k02vGngr9LvPi3dEnBlPlX3IL9/view"},
+    {icon:"🌿",title:"El Peque\u00f1o Gran Mundo de las CCNN",author:"MPPE Venezuela \ud83c\uddfb\ud83c\uddea",url:"https://drive.google.com/file/d/1kgyKk1jQFf151KVn6y07cHtV-S5aPsj3/view"}
+  ],
+  "materia": [
+    {icon:"⚗️",title:"Estados de la Materia y sus Cambios",author:"Webcolegios",url:"https://drive.google.com/file/d/1GdFfWFAooCjPTQR03CmmZFTslS7TM6wi/view"},
+    {icon:"🧪",title:"Estados de la Materia \u2013 Elbibliote",author:"Elbibliote.com",url:"https://drive.google.com/file/d/1FVxDZfKw1IlxWXGl6wfNKY2l6MijXqQu/view"},
+    {icon:"🔬",title:"Talleres para Ense\u00f1ar Qu\u00edmica en Primaria",author:"UCM Espa\u00f1a",url:"https://drive.google.com/file/d/1ihV5qnQhy2hjHGCeFrph5_wIfpaPOHsz/view"},
+    {icon:"🔬",title:"Ciencias Naturales 4\u00b0 \u2013 SEP M\u00e9xico",author:"SEP M\u00e9xico",url:"https://drive.google.com/file/d/11aEmrVuNPsAmqbpgB7yTiFmyN0htYDxJ/view"},
+    {icon:"📚",title:"Cuadernos para el Aula \u2013 CCNN 4",author:"BNM Argentina",url:"https://drive.google.com/file/d/18XaFE9k02vGngr9LvPi3dEnBlPlX3IL9/view"},
+    {icon:"🌿",title:"El Peque\u00f1o Gran Mundo de las CCNN",author:"MPPE Venezuela \ud83c\uddfb\ud83c\uddea",url:"https://drive.google.com/file/d/1kgyKk1jQFf151KVn6y07cHtV-S5aPsj3/view"}
+  ],
+  "cammat": [
+    {icon:"🔥",title:"Estados de la Materia y sus Cambios",author:"Webcolegios",url:"https://drive.google.com/file/d/1GdFfWFAooCjPTQR03CmmZFTslS7TM6wi/view"},
+    {icon:"🧪",title:"Talleres para Ense\u00f1ar Qu\u00edmica en Primaria",author:"UCM Espa\u00f1a",url:"https://drive.google.com/file/d/1ihV5qnQhy2hjHGCeFrph5_wIfpaPOHsz/view"},
+    {icon:"⚡",title:"Energ\u00eda para la Vida \u2013 Tomo I",author:"CCNN Venezuela",url:"https://drive.google.com/file/d/1lcLMPvSVMkgzeP23aBs6r7WMIuN5v-Io/view"},
+    {icon:"🔬",title:"Ciencias Naturales 4\u00b0 \u2013 SEP M\u00e9xico",author:"SEP M\u00e9xico",url:"https://drive.google.com/file/d/11aEmrVuNPsAmqbpgB7yTiFmyN0htYDxJ/view"},
+    {icon:"📚",title:"Cuadernos para el Aula \u2013 CCNN 4",author:"BNM Argentina",url:"https://drive.google.com/file/d/18XaFE9k02vGngr9LvPi3dEnBlPlX3IL9/view"},
+    {icon:"🌿",title:"El Peque\u00f1o Gran Mundo de las CCNN",author:"MPPE Venezuela \ud83c\uddfb\ud83c\uddea",url:"https://drive.google.com/file/d/1kgyKk1jQFf151KVn6y07cHtV-S5aPsj3/view"}
+  ],
+  "luzsom": [
+    {icon:"💡",title:"Luz: Reflexi\u00f3n y Refracci\u00f3n",author:"Elbibliote.com",url:"https://drive.google.com/file/d/1zexL49VMMO2_Kb0JlOxlJYaoZp4inUzW/view"},
+    {icon:"🌈",title:"Reflexi\u00f3n y Refracci\u00f3n de la Luz \u2013 SEP",author:"SEP M\u00e9xico",url:"https://drive.google.com/file/d/14k6tCoKRRwaxyRfu7LycgLFW6ujlYiqG/view"},
+    {icon:"🔦",title:"La Luz y el Sonido",author:"Proyecto Descartes",url:"https://drive.google.com/file/d/1ENb9UaJlOYrpruFH-GD_x4x7M7dkPtFM/view"},
+    {icon:"🔬",title:"Ciencias Naturales 4\u00b0 \u2013 SEP M\u00e9xico",author:"SEP M\u00e9xico",url:"https://drive.google.com/file/d/11aEmrVuNPsAmqbpgB7yTiFmyN0htYDxJ/view"},
+    {icon:"📚",title:"Cuadernos para el Aula \u2013 CCNN 4",author:"BNM Argentina",url:"https://drive.google.com/file/d/18XaFE9k02vGngr9LvPi3dEnBlPlX3IL9/view"},
+    {icon:"🌿",title:"El Peque\u00f1o Gran Mundo de las CCNN",author:"MPPE Venezuela \ud83c\uddfb\ud83c\uddea",url:"https://drive.google.com/file/d/1kgyKk1jQFf151KVn6y07cHtV-S5aPsj3/view"}
+  ],
+  "sonido": [
+    {icon:"🔊",title:"El Sonido \u2013 F\u00edsica",author:"Instituto Nacional Chile",url:"https://drive.google.com/file/d/1sMU_b5faV06FP1DvTP7TvLF_feXXWSL7/view"},
+    {icon:"🎵",title:"Vibraciones y Ondas: El Sonido y la Luz",author:"UDO Bol\u00edvar \ud83c\uddfb\ud83c\uddea",url:"https://drive.google.com/file/d/1LKvbGnnf90nU0AJrr2xJo-r_2SIyoGhu/view"},
+    {icon:"🎶",title:"La Luz y el Sonido",author:"Proyecto Descartes",url:"https://drive.google.com/file/d/1ENb9UaJlOYrpruFH-GD_x4x7M7dkPtFM/view"},
+    {icon:"🔬",title:"Ciencias Naturales 4\u00b0 \u2013 SEP M\u00e9xico",author:"SEP M\u00e9xico",url:"https://drive.google.com/file/d/11aEmrVuNPsAmqbpgB7yTiFmyN0htYDxJ/view"},
+    {icon:"📚",title:"Cuadernos para el Aula \u2013 CCNN 4",author:"BNM Argentina",url:"https://drive.google.com/file/d/18XaFE9k02vGngr9LvPi3dEnBlPlX3IL9/view"},
+    {icon:"🌿",title:"El Peque\u00f1o Gran Mundo de las CCNN",author:"MPPE Venezuela \ud83c\uddfb\ud83c\uddea",url:"https://drive.google.com/file/d/1kgyKk1jQFf151KVn6y07cHtV-S5aPsj3/view"}
+  ],
+  "petroven": [
+    {icon:"🛢️",title:"Matriz Energ\u00e9tica y El\u00e9ctrica de Venezuela",author:"FES Venezuela \ud83c\uddfb\ud83c\uddea",url:"https://drive.google.com/file/d/1-_jleQg5C9vN0lLNssLjM-G0NjpDNpcX/view"},
+    {icon:"⛽",title:"Producci\u00f3n, Reservas y Sostenibilidad Energ\u00e9tica en Venezuela",author:"U. Cat\u00f3lica L. Amig\u00f3 \ud83c\uddfb\ud83c\uddea",url:"https://drive.google.com/file/d/1eAerYsH37KZMLgfQR8cmBQB_R2cAHxvG/view"},
+    {icon:"🔋",title:"Energ\u00eda para la Vida \u2013 Tomo I",author:"CCNN Venezuela \ud83c\uddfb\ud83c\uddea",url:"https://drive.google.com/file/d/1lcLMPvSVMkgzeP23aBs6r7WMIuN5v-Io/view"},
+    {icon:"🔬",title:"Ciencias Naturales 4\u00b0 \u2013 SEP M\u00e9xico",author:"SEP M\u00e9xico",url:"https://drive.google.com/file/d/11aEmrVuNPsAmqbpgB7yTiFmyN0htYDxJ/view"},
+    {icon:"📚",title:"Cuadernos para el Aula \u2013 CCNN 4",author:"BNM Argentina",url:"https://drive.google.com/file/d/18XaFE9k02vGngr9LvPi3dEnBlPlX3IL9/view"},
+    {icon:"🌿",title:"El Peque\u00f1o Gran Mundo de las CCNN",author:"MPPE Venezuela \ud83c\uddfb\ud83c\uddea",url:"https://drive.google.com/file/d/1kgyKk1jQFf151KVn6y07cHtV-S5aPsj3/view"}
+  ],
+  "fuentener": [
+    {icon:"☀️",title:"Matriz Energ\u00e9tica y El\u00e9ctrica de Venezuela",author:"FES Venezuela \ud83c\uddfb\ud83c\uddea",url:"https://drive.google.com/file/d/1-_jleQg5C9vN0lLNssLjM-G0NjpDNpcX/view"},
+    {icon:"🌬️",title:"Producci\u00f3n, Reservas y Sostenibilidad Energ\u00e9tica en Venezuela",author:"U. Cat\u00f3lica L. Amig\u00f3 \ud83c\uddfb\ud83c\uddea",url:"https://drive.google.com/file/d/1eAerYsH37KZMLgfQR8cmBQB_R2cAHxvG/view"},
+    {icon:"⚡",title:"Talleres para Ense\u00f1ar Qu\u00edmica en Primaria",author:"UCM Espa\u00f1a",url:"https://drive.google.com/file/d/1ihV5qnQhy2hjHGCeFrph5_wIfpaPOHsz/view"},
+    {icon:"🔬",title:"Ciencias Naturales 4\u00b0 \u2013 SEP M\u00e9xico",author:"SEP M\u00e9xico",url:"https://drive.google.com/file/d/11aEmrVuNPsAmqbpgB7yTiFmyN0htYDxJ/view"},
+    {icon:"📚",title:"Cuadernos para el Aula \u2013 CCNN 4",author:"BNM Argentina",url:"https://drive.google.com/file/d/18XaFE9k02vGngr9LvPi3dEnBlPlX3IL9/view"},
+    {icon:"🌿",title:"El Peque\u00f1o Gran Mundo de las CCNN",author:"MPPE Venezuela \ud83c\uddfb\ud83c\uddea",url:"https://drive.google.com/file/d/1kgyKk1jQFf151KVn6y07cHtV-S5aPsj3/view"}
+  ],
+  "maqsimp": [
+    {icon:"⚙️",title:"Las M\u00e1quinas Simples",author:"Santillana Espa\u00f1a",url:"https://drive.google.com/file/d/1O7FkfuQz5k-QwvTxtJ-tU4Y-J9JyRYuq/view"},
+    {icon:"🔧",title:"Tecnolog\u00eda en la Vida Diaria",author:"Santillana M\u00e9xico",url:"https://drive.google.com/file/d/10UAGck8lDdWhRWlA-OecpcKUe1nNjuiS/view"},
+    {icon:"🛠️",title:"Ciencias Naturales 4\u00b0 \u2013 SEP M\u00e9xico",author:"SEP M\u00e9xico",url:"https://drive.google.com/file/d/11aEmrVuNPsAmqbpgB7yTiFmyN0htYDxJ/view"},
+    {icon:"📚",title:"Cuadernos para el Aula \u2013 CCNN 4",author:"BNM Argentina",url:"https://drive.google.com/file/d/18XaFE9k02vGngr9LvPi3dEnBlPlX3IL9/view"},
+    {icon:"🌿",title:"El Peque\u00f1o Gran Mundo de las CCNN",author:"MPPE Venezuela \ud83c\uddfb\ud83c\uddea",url:"https://drive.google.com/file/d/1kgyKk1jQFf151KVn6y07cHtV-S5aPsj3/view"}
+  ],
+  "tierra": [
+    {icon:"🌍",title:"Descripci\u00f3n General de los Suelos",author:"Soils 4 Teachers",url:"https://drive.google.com/file/d/157yTWMK2qfBPB-aUekHimMDgpMCeaZZW/view"},
+    {icon:"🪨",title:"Gu\u00eda del Sistema Solar \u2013 Grado 4",author:"Taller Educativo",url:"https://drive.google.com/file/d/12yd0vthiyKG3Q_-NhXGwZFIUtiLQwuoL/view"},
+    {icon:"🌏",title:"CCNN 4\u00b0 \u2013 SEP M\u00e9xico (Sistema Solar)",author:"SEP M\u00e9xico",url:"https://drive.google.com/file/d/1RLfYPwXsU3KlFHVKIopd09RnqL8QrN6W/view"},
+    {icon:"🔬",title:"Ciencias Naturales 4\u00b0 \u2013 SEP M\u00e9xico",author:"SEP M\u00e9xico",url:"https://drive.google.com/file/d/11aEmrVuNPsAmqbpgB7yTiFmyN0htYDxJ/view"},
+    {icon:"📚",title:"Cuadernos para el Aula \u2013 CCNN 4",author:"BNM Argentina",url:"https://drive.google.com/file/d/18XaFE9k02vGngr9LvPi3dEnBlPlX3IL9/view"},
+    {icon:"🌿",title:"El Peque\u00f1o Gran Mundo de las CCNN",author:"MPPE Venezuela \ud83c\uddfb\ud83c\uddea",url:"https://drive.google.com/file/d/1kgyKk1jQFf151KVn6y07cHtV-S5aPsj3/view"}
+  ],
+  "atmosfera": [
+    {icon:"🌩️",title:"Meteorolog\u00eda y Climatolog\u00eda",author:"FECYT Espa\u00f1a",url:"https://drive.google.com/file/d/1gd3q7BX4dv_cHTR3DO8wPP-ktN8eFD5D/view"},
+    {icon:"🌦️",title:"El Aire \u2013 Composici\u00f3n y Propiedades",author:"INET Argentina",url:"https://drive.google.com/file/d/1pCln-ym_t-kpMBerDqrqLSb6YBdydnqh/view"},
+    {icon:"🌧️",title:"El Ciclo del Agua \u2013 Gu\u00eda Whynauts",author:"Perot Museum",url:"https://drive.google.com/file/d/1LsvKE1W8xn3CVfCtpdi--X43Es_EfxOP/view"},
+    {icon:"🔬",title:"Ciencias Naturales 4\u00b0 \u2013 SEP M\u00e9xico",author:"SEP M\u00e9xico",url:"https://drive.google.com/file/d/11aEmrVuNPsAmqbpgB7yTiFmyN0htYDxJ/view"},
+    {icon:"📚",title:"Cuadernos para el Aula \u2013 CCNN 4",author:"BNM Argentina",url:"https://drive.google.com/file/d/18XaFE9k02vGngr9LvPi3dEnBlPlX3IL9/view"},
+    {icon:"🌿",title:"El Peque\u00f1o Gran Mundo de las CCNN",author:"MPPE Venezuela \ud83c\uddfb\ud83c\uddea",url:"https://drive.google.com/file/d/1kgyKk1jQFf151KVn6y07cHtV-S5aPsj3/view"}
+  ],
+  "movtie": [
+    {icon:"🌀",title:"CCNN 4\u00b0 \u2013 SEP M\u00e9xico (Sistema Solar)",author:"SEP M\u00e9xico",url:"https://drive.google.com/file/d/1RLfYPwXsU3KlFHVKIopd09RnqL8QrN6W/view"},
+    {icon:"🔄",title:"Sistema Solar \u2013 Gu\u00eda Grado 4",author:"Taller Educativo",url:"https://drive.google.com/file/d/13Q3XWU7tIez2asWdEG1L8a4Arsevq3S1/view"},
+    {icon:"🌍",title:"Gu\u00eda del Sistema Solar \u2013 Grado 4",author:"Taller Educativo",url:"https://drive.google.com/file/d/12yd0vthiyKG3Q_-NhXGwZFIUtiLQwuoL/view"},
+    {icon:"🔬",title:"Ciencias Naturales 4\u00b0 \u2013 SEP M\u00e9xico",author:"SEP M\u00e9xico",url:"https://drive.google.com/file/d/11aEmrVuNPsAmqbpgB7yTiFmyN0htYDxJ/view"},
+    {icon:"📚",title:"Cuadernos para el Aula \u2013 CCNN 4",author:"BNM Argentina",url:"https://drive.google.com/file/d/18XaFE9k02vGngr9LvPi3dEnBlPlX3IL9/view"},
+    {icon:"🌿",title:"El Peque\u00f1o Gran Mundo de las CCNN",author:"MPPE Venezuela \ud83c\uddfb\ud83c\uddea",url:"https://drive.google.com/file/d/1kgyKk1jQFf151KVn6y07cHtV-S5aPsj3/view"}
+  ],
+  "luna": [
+    {icon:"🌙",title:"Gu\u00eda del Sistema Solar \u2013 Grado 4",author:"Taller Educativo",url:"https://drive.google.com/file/d/12yd0vthiyKG3Q_-NhXGwZFIUtiLQwuoL/view"},
+    {icon:"🌛",title:"Sistema Solar \u2013 Gu\u00eda Grado 4",author:"Taller Educativo",url:"https://drive.google.com/file/d/13Q3XWU7tIez2asWdEG1L8a4Arsevq3S1/view"},
+    {icon:"🌕",title:"CCNN 4\u00b0 \u2013 SEP M\u00e9xico (Sistema Solar)",author:"SEP M\u00e9xico",url:"https://drive.google.com/file/d/1RLfYPwXsU3KlFHVKIopd09RnqL8QrN6W/view"},
+    {icon:"🔬",title:"Ciencias Naturales 4\u00b0 \u2013 SEP M\u00e9xico",author:"SEP M\u00e9xico",url:"https://drive.google.com/file/d/11aEmrVuNPsAmqbpgB7yTiFmyN0htYDxJ/view"},
+    {icon:"📚",title:"Cuadernos para el Aula \u2013 CCNN 4",author:"BNM Argentina",url:"https://drive.google.com/file/d/18XaFE9k02vGngr9LvPi3dEnBlPlX3IL9/view"},
+    {icon:"🌿",title:"El Peque\u00f1o Gran Mundo de las CCNN",author:"MPPE Venezuela \ud83c\uddfb\ud83c\uddea",url:"https://drive.google.com/file/d/1kgyKk1jQFf151KVn6y07cHtV-S5aPsj3/view"}
+  ],
+  "sistemsol": [
+    {icon:"🌌",title:"Gu\u00eda del Sistema Solar \u2013 Grado 4",author:"Taller Educativo",url:"https://drive.google.com/file/d/12yd0vthiyKG3Q_-NhXGwZFIUtiLQwuoL/view"},
+    {icon:"🪐",title:"CCNN 4\u00b0 \u2013 SEP M\u00e9xico (Sistema Solar)",author:"SEP M\u00e9xico",url:"https://drive.google.com/file/d/1RLfYPwXsU3KlFHVKIopd09RnqL8QrN6W/view"},
+    {icon:"⭐",title:"Sistema Solar \u2013 Gu\u00eda Grado 4",author:"Taller Educativo",url:"https://drive.google.com/file/d/13Q3XWU7tIez2asWdEG1L8a4Arsevq3S1/view"},
+    {icon:"🔬",title:"Ciencias Naturales 4\u00b0 \u2013 SEP M\u00e9xico",author:"SEP M\u00e9xico",url:"https://drive.google.com/file/d/11aEmrVuNPsAmqbpgB7yTiFmyN0htYDxJ/view"},
+    {icon:"📚",title:"Cuadernos para el Aula \u2013 CCNN 4",author:"BNM Argentina",url:"https://drive.google.com/file/d/18XaFE9k02vGngr9LvPi3dEnBlPlX3IL9/view"},
+    {icon:"🌿",title:"El Peque\u00f1o Gran Mundo de las CCNN",author:"MPPE Venezuela \ud83c\uddfb\ud83c\uddea",url:"https://drive.google.com/file/d/1kgyKk1jQFf151KVn6y07cHtV-S5aPsj3/view"}
+  ],
+  "higiene": [
+    {icon:"🧼",title:"Vida Saludable 4 \u2013 Santillana",author:"Santillana M\u00e9xico",url:"https://drive.google.com/file/d/1ewmSwdPgD4D5WA912ZS5dq6ZG-N-jLro/view"},
+    {icon:"🪥",title:"Vida Saludable \u2013 SEP M\u00e9xico",author:"SEP M\u00e9xico",url:"https://drive.google.com/file/d/1Pyz6g0IXG9O9RG9oNk0c5E-_ehpADI0L/view"},
+    {icon:"💊",title:"CCNN y Ed. Ambiental 4\u00b0 \u2013 Escuela Nueva",author:"Min. Educaci\u00f3n Colombia",url:"https://drive.google.com/file/d/1c8xsyMcvgkm27Xk9JJ2gN8FDQi6oa16Q/view"},
+    {icon:"🔬",title:"Ciencias Naturales 4\u00b0 \u2013 SEP M\u00e9xico",author:"SEP M\u00e9xico",url:"https://drive.google.com/file/d/11aEmrVuNPsAmqbpgB7yTiFmyN0htYDxJ/view"},
+    {icon:"📚",title:"Cuadernos para el Aula \u2013 CCNN 4",author:"BNM Argentina",url:"https://drive.google.com/file/d/18XaFE9k02vGngr9LvPi3dEnBlPlX3IL9/view"},
+    {icon:"🌿",title:"El Peque\u00f1o Gran Mundo de las CCNN",author:"MPPE Venezuela \ud83c\uddfb\ud83c\uddea",url:"https://drive.google.com/file/d/1kgyKk1jQFf151KVn6y07cHtV-S5aPsj3/view"}
+  ],
+  "alimenta": [
+    {icon:"🥗",title:"Vida Saludable 4 \u2013 Santillana",author:"Santillana M\u00e9xico",url:"https://drive.google.com/file/d/15UXeVe4nzIO0Cksnh-a0I5MZxpo5gRyE/view"},
+    {icon:"🍎",title:"Vida Saludable \u2013 SEP M\u00e9xico",author:"SEP M\u00e9xico",url:"https://drive.google.com/file/d/149e28W3NUiFPnXC2jJ1Ndb0pN3AXeAJB/view"},
+    {icon:"🥦",title:"CCNN y Ed. Ambiental 4\u00b0 \u2013 Escuela Nueva",author:"Min. Educaci\u00f3n Colombia",url:"https://drive.google.com/file/d/1c8xsyMcvgkm27Xk9JJ2gN8FDQi6oa16Q/view"},
+    {icon:"🔬",title:"Ciencias Naturales 4\u00b0 \u2013 SEP M\u00e9xico",author:"SEP M\u00e9xico",url:"https://drive.google.com/file/d/11aEmrVuNPsAmqbpgB7yTiFmyN0htYDxJ/view"},
+    {icon:"📚",title:"Cuadernos para el Aula \u2013 CCNN 4",author:"BNM Argentina",url:"https://drive.google.com/file/d/18XaFE9k02vGngr9LvPi3dEnBlPlX3IL9/view"},
+    {icon:"🌿",title:"El Peque\u00f1o Gran Mundo de las CCNN",author:"MPPE Venezuela \ud83c\uddfb\ud83c\uddea",url:"https://drive.google.com/file/d/1kgyKk1jQFf151KVn6y07cHtV-S5aPsj3/view"}
+  ],
+  "enfermed": [
+    {icon:"🏥",title:"Manual de Primeros Auxilios Pedi\u00e1tricos",author:"Municipalidad de Rosario",url:"https://drive.google.com/file/d/1Zv6STxwYQMZSSNqaQ-mRokkTQsua3B2w/view"},
+    {icon:"💉",title:"Primeros Auxilios Pedi\u00e1tricos",author:"Conexi\u00f3n Salud",url:"https://drive.google.com/file/d/1zOh6y09toPbKFPFVXIQeJ7nj1SS4eiBc/view"},
+    {icon:"🩺",title:"Vida Saludable 4 \u2013 Santillana",author:"Santillana M\u00e9xico",url:"https://drive.google.com/file/d/1ewmSwdPgD4D5WA912ZS5dq6ZG-N-jLro/view"},
+    {icon:"🔬",title:"Ciencias Naturales 4\u00b0 \u2013 SEP M\u00e9xico",author:"SEP M\u00e9xico",url:"https://drive.google.com/file/d/11aEmrVuNPsAmqbpgB7yTiFmyN0htYDxJ/view"},
+    {icon:"📚",title:"Cuadernos para el Aula \u2013 CCNN 4",author:"BNM Argentina",url:"https://drive.google.com/file/d/18XaFE9k02vGngr9LvPi3dEnBlPlX3IL9/view"},
+    {icon:"🌿",title:"El Peque\u00f1o Gran Mundo de las CCNN",author:"MPPE Venezuela \ud83c\uddfb\ud83c\uddea",url:"https://drive.google.com/file/d/1kgyKk1jQFf151KVn6y07cHtV-S5aPsj3/view"}
+  ],
+  "primauxil": [
+    {icon:"🚑",title:"Manual Primeros Auxilios Pedi\u00e1tricos",author:"Colegio Maestro \u00c1vila",url:"https://drive.google.com/file/d/1wTH-1QJR_WTEij1f0znP0bNUJaekzY5P/view"},
+    {icon:"🩹",title:"Primeros Auxilios Pedi\u00e1tricos",author:"Conexi\u00f3n Salud",url:"https://drive.google.com/file/d/1zOh6y09toPbKFPFVXIQeJ7nj1SS4eiBc/view"},
+    {icon:"❤️",title:"Manual de Primeros Auxilios Pedi\u00e1tricos",author:"Municipalidad de Rosario",url:"https://drive.google.com/file/d/1Zv6STxwYQMZSSNqaQ-mRokkTQsua3B2w/view"},
+    {icon:"🔬",title:"Ciencias Naturales 4\u00b0 \u2013 SEP M\u00e9xico",author:"SEP M\u00e9xico",url:"https://drive.google.com/file/d/11aEmrVuNPsAmqbpgB7yTiFmyN0htYDxJ/view"},
+    {icon:"📚",title:"Cuadernos para el Aula \u2013 CCNN 4",author:"BNM Argentina",url:"https://drive.google.com/file/d/18XaFE9k02vGngr9LvPi3dEnBlPlX3IL9/view"},
+    {icon:"🌿",title:"El Peque\u00f1o Gran Mundo de las CCNN",author:"MPPE Venezuela \ud83c\uddfb\ud83c\uddea",url:"https://drive.google.com/file/d/1kgyKk1jQFf151KVn6y07cHtV-S5aPsj3/view"}
+  ],
+  "huerto": [
+    {icon:"🌱",title:"Proyecto Huerto Escolar: Sembrando nos Alimentamos",author:"Campus Educativo Santa Fe",url:"https://drive.google.com/file/d/1Z2kbNdSyEvQ1snSfUwbHW09FBgQQ-e7t/view"},
+    {icon:"🌻",title:"C\u00f3mo Cultivar tus Plantas",author:"UniR\u00edo Editora",url:"https://drive.google.com/file/d/1lcLMPvSVMkgzeP23aBs6r7WMIuN5v-Io/view"},
+    {icon:"🪴",title:"Bot\u00e1nica \u2013 Ciencias Naturales",author:"BNM Argentina",url:"https://drive.google.com/file/d/11S4YIWqkt6rd3LuLPXRoTRI3R1gfhPuf/view"},
+    {icon:"🔬",title:"Ciencias Naturales 4\u00b0 \u2013 SEP M\u00e9xico",author:"SEP M\u00e9xico",url:"https://drive.google.com/file/d/11aEmrVuNPsAmqbpgB7yTiFmyN0htYDxJ/view"},
+    {icon:"📚",title:"Cuadernos para el Aula \u2013 CCNN 4",author:"BNM Argentina",url:"https://drive.google.com/file/d/18XaFE9k02vGngr9LvPi3dEnBlPlX3IL9/view"},
+    {icon:"🌿",title:"El Peque\u00f1o Gran Mundo de las CCNN",author:"MPPE Venezuela \ud83c\uddfb\ud83c\uddea",url:"https://drive.google.com/file/d/1kgyKk1jQFf151KVn6y07cHtV-S5aPsj3/view"}
+  ],
+  "metcien": [
+    {icon:"🔬",title:"Manual de Experimentos \u2013 La Ciencia es Divertida",author:"CONCYTEQ",url:"https://drive.google.com/file/d/11jXHmqwVk9xVCDNKrcGjTkVj74iPdZ5c/view"},
+    {icon:"🧫",title:"Talleres para Ense\u00f1ar Qu\u00edmica en Primaria",author:"UCM Espa\u00f1a",url:"https://drive.google.com/file/d/1PdNK7mVsX5zvPQduGKbSoZEzcEuJ7m3d/view"},
+    {icon:"📋",title:"Ciencias Naturales 4\u00b0 \u2013 SEP M\u00e9xico",author:"SEP M\u00e9xico",url:"https://drive.google.com/file/d/11aEmrVuNPsAmqbpgB7yTiFmyN0htYDxJ/view"},
+    {icon:"📚",title:"Cuadernos para el Aula \u2013 CCNN 4",author:"BNM Argentina",url:"https://drive.google.com/file/d/18XaFE9k02vGngr9LvPi3dEnBlPlX3IL9/view"},
+    {icon:"🌿",title:"El Peque\u00f1o Gran Mundo de las CCNN",author:"MPPE Venezuela \ud83c\uddfb\ud83c\uddea",url:"https://drive.google.com/file/d/1kgyKk1jQFf151KVn6y07cHtV-S5aPsj3/view"}
+  ],
+  "exper": [
+    {icon:"🧪",title:"Manual de Experimentos \u2013 La Ciencia es Divertida",author:"CONCYTEQ",url:"https://drive.google.com/file/d/11jXHmqwVk9xVCDNKrcGjTkVj74iPdZ5c/view"},
+    {icon:"⚗️",title:"Talleres para Ense\u00f1ar Qu\u00edmica en Primaria",author:"UCM Espa\u00f1a",url:"https://drive.google.com/file/d/1PdNK7mVsX5zvPQduGKbSoZEzcEuJ7m3d/view"},
+    {icon:"🔧",title:"Las M\u00e1quinas Simples",author:"Santillana Espa\u00f1a",url:"https://drive.google.com/file/d/1O7FkfuQz5k-QwvTxtJ-tU4Y-J9JyRYuq/view"},
+    {icon:"🔬",title:"Ciencias Naturales 4\u00b0 \u2013 SEP M\u00e9xico",author:"SEP M\u00e9xico",url:"https://drive.google.com/file/d/11aEmrVuNPsAmqbpgB7yTiFmyN0htYDxJ/view"},
+    {icon:"📚",title:"Cuadernos para el Aula \u2013 CCNN 4",author:"BNM Argentina",url:"https://drive.google.com/file/d/18XaFE9k02vGngr9LvPi3dEnBlPlX3IL9/view"},
+    {icon:"🌿",title:"El Peque\u00f1o Gran Mundo de las CCNN",author:"MPPE Venezuela \ud83c\uddfb\ud83c\uddea",url:"https://drive.google.com/file/d/1kgyKk1jQFf151KVn6y07cHtV-S5aPsj3/view"}
+  ],
+  "tecnol": [
+    {icon:"🤖",title:"Tecnolog\u00eda en la Vida Diaria",author:"Santillana M\u00e9xico",url:"https://drive.google.com/file/d/10UAGck8lDdWhRWlA-OecpcKUe1nNjuiS/view"},
+    {icon:"⚙️",title:"Las M\u00e1quinas Simples",author:"Santillana Espa\u00f1a",url:"https://drive.google.com/file/d/1O7FkfuQz5k-QwvTxtJ-tU4Y-J9JyRYuq/view"},
+    {icon:"💡",title:"Manual de Experimentos \u2013 La Ciencia es Divertida",author:"CONCYTEQ",url:"https://drive.google.com/file/d/11jXHmqwVk9xVCDNKrcGjTkVj74iPdZ5c/view"},
+    {icon:"🔬",title:"Ciencias Naturales 4\u00b0 \u2013 SEP M\u00e9xico",author:"SEP M\u00e9xico",url:"https://drive.google.com/file/d/11aEmrVuNPsAmqbpgB7yTiFmyN0htYDxJ/view"},
+    {icon:"📚",title:"Cuadernos para el Aula \u2013 CCNN 4",author:"BNM Argentina",url:"https://drive.google.com/file/d/18XaFE9k02vGngr9LvPi3dEnBlPlX3IL9/view"},
+    {icon:"🌿",title:"El Peque\u00f1o Gran Mundo de las CCNN",author:"MPPE Venezuela \ud83c\uddfb\ud83c\uddea",url:"https://drive.google.com/file/d/1kgyKk1jQFf151KVn6y07cHtV-S5aPsj3/view"}
+  ],
+};
+
+function renderLibros(libros, color) {
+  if (!libros.length) return '<p style="color:#999;padding:20px">No hay libros disponibles aún.</p>';
+  return '<div class="books-grid">' + libros.map(b => `
+    <div class="book-card" onclick="openBook('${b.url}','${b.title}')">
+      <div class="book-icon">${b.icon}</div>
+      <div class="book-title">${b.title}</div>
+      <div class="book-author">${b.author}</div>
+      <button class="book-btn" style="background:${color||'#1565C0'}">📖 Abrir libro</button>
+    </div>
+  `).join('') + '</div>';
+}
+
+function switchTab(tab, el) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('tab-libros').style.display = tab==='libros' ? '' : 'none';
+  var encEl = document.getElementById('tab-encuesta');
+  if (encEl) {
+    encEl.style.display = tab==='encuesta' ? '' : 'none';
+    if (tab==='encuesta' && !encEl.dataset.loaded) {
+      encEl.innerHTML = renderEncuesta(currentTopic);
+      encEl.dataset.loaded = '1';
+    }
+  }
+}
+
+function openBook(url, title) {
+  const params = new URLSearchParams({url, title});
+  window.open('lector.html?' + params.toString(), '_blank');
+}function toggleBloque(name) {
+  const el = document.getElementById('bloque-' + name);
+  el.classList.toggle('collapsed');
+  if (!el.classList.contains('collapsed')) el.style.maxHeight = el.scrollHeight + 'px';
+  else el.style.maxHeight = '0';
+}
+
+function selectTopic(key) {
+  currentTopic = key;
+  document.querySelectorAll('.topic-item').forEach(e => e.classList.remove('active'));
+  const item = document.getElementById('item-' + key);
+  if (item) item.classList.add('active');
+  renderPanel(key);
+}
+
+function renderPanel(key) {
+  const t = TOPICS_MAP[key];
+  const libros = LIBROS[key] || [];
+  const color = BLOQUE_COLORS[t.bloque] || '#2E7D32';
+  var encAll = (typeof ENCUESTAS_ALL !== 'undefined') ? ENCUESTAS_ALL : {};
+  var tieneEncuesta = !!encAll[key];
+  const tabEnc = tieneEncuesta
+    ? `<div class="tab" id="tab-btn-encuesta" onclick="switchTab('encuesta',this)">📝 Encuesta</div>`
+    : '';
+  const panelEnc = tieneEncuesta
+    ? `<div id="tab-encuesta" style="display:none"></div>`
+    : '';
+
+  document.getElementById('content').innerHTML = `
+    <div class="topic-panel">
+      <div class="topic-header">
+        <div class="topic-emoji">${t.emoji}</div>
+        <div class="topic-info">
+          <h1>${t.title}</h1>
+          <p>${t.sub} &nbsp;·&nbsp; <span style="font-size:.8rem;color:#888">${libros.length} libro${libros.length!==1?'s':''} disponible${libros.length!==1?'s':''}</span></p>
+        </div>
+      </div>
+      <div class="tabs">
+        <div class="tab active" id="tab-btn-libros" onclick="switchTab('libros',this)">📚 Libros</div>
+        ${tabEnc}
+      </div>
+      <div id="tab-libros">${renderLibros(libros, color)}</div>
+      ${panelEnc}
+    </div>
+  `;
+}
+
+
+function switchTab(tab, el) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('tab-libros').style.display = tab==='libros' ? '' : 'none';
+  var encEl = document.getElementById('tab-encuesta');
+  if (encEl) {
+    encEl.style.display = tab==='encuesta' ? '' : 'none';
+    if (tab==='encuesta' && !encEl.dataset.loaded) {
+      encEl.innerHTML = renderEncuesta(currentTopic);
+      encEl.dataset.loaded = '1';
+    }
+  }
+}
+
+function openBook(url, title) {
+  const params = new URLSearchParams({url, title});
+  window.open('lector.html?' + params.toString(), '_blank');
+}
+
+</script>
+
+<script>
+// ── FUNCIONES UTILITARIAS DE ENCUESTAS ────────────────────────────────
+function getEncuestasLog() {
+  try { return JSON.parse(localStorage.getItem('biblioEncuestas') || '{}'); }
+  catch(e) { return {}; }
+}
+function saveEncuestasLog(log) {
+  localStorage.setItem('biblioEncuestas', JSON.stringify(log));
+}
+function encuestaCompletada(topicId) {
+  return !!getEncuestasLog()[topicId];
+}
+function marcarEncuesta(topicId, ptsGanados) {
+  var log = getEncuestasLog();
+  log[topicId] = { pts: ptsGanados, fecha: new Date().toISOString() };
+  saveEncuestasLog(log);
+}
+
+// ── Añadir puntos a la sesión del estudiante ──────────────────
+function sumarPuntosEncuesta(pts) {
+  if (typeof window.actualizarPuntos === 'function') {
+    return window.actualizarPuntos(pts);
+  }
+  try {
+    var raw  = localStorage.getItem('biblioSesion');
+    var data = raw ? JSON.parse(raw) : {};
+    data.puntos = (data.puntos || 0) + pts;
+    localStorage.setItem('biblioSesion', JSON.stringify(data));
+    return data.puntos;
+  } catch(e) { return 0; }
+}
+
+function getSesionPts() {
+  try { return JSON.parse(localStorage.getItem('biblioSesion') || '{}').puntos || 0; }
+  catch(e) { return 0; }
+}
+
+// ── ENCUESTA / QUIZ ───────────────────────────────────────────────────────
+var _quizState = {};  // estado de la quiz activa
+
+function renderEncuesta(topicId) {
+  var enc = (typeof ENCUESTAS_ALL !== 'undefined') ? ENCUESTAS_ALL[topicId] : null;
+  if (!enc) return '<p style="color:#aaa;padding:20px;font-size:.9rem">No hay encuesta disponible para este tema.</p>';
+
+  var log   = getEncuestasLog();
+  var entry = log[topicId];
+  var maxPts = enc.preguntas.length * enc.ptsCorrecta + enc.ptsPerfecto;
+
+  if (entry && entry.aprobado) {
+    // Aprobado → bloqueado permanentemente
+    return '<div class="enc-wrap">' +
+      '<div class="enc-status">' +
+      '<span class="enc-icon">&#127942;</span>' +
+      '<div class="enc-txt"><strong>&#161;Ya completaste esta encuesta!</strong><br>' +
+      '<span class="enc-pts">+' + entry.pts + ' puntos ganados</span></div>' +
+      '</div>' +
+      '<div class="quiz-result">' +
+      '<span class="res-emoji">&#11088;</span>' +
+      '<h3>Encuesta completada</h3>' +
+      '<p>Vuelve a leer el tema para reforzar lo aprendido.</p>' +
+      '</div></div>';
+  }
+
+  if (entry && !entry.aprobado) {
+    // Falló → verificar si han pasado 12 horas
+    var ahora   = Date.now();
+    var fechaInt= new Date(entry.fecha).getTime();
+    var diff    = ahora - fechaInt;
+    var ESPERA  = 12 * 3600 * 1000;
+
+    if (diff < ESPERA) {
+      // Aún en espera
+      var restMs  = ESPERA - diff;
+      var horas   = Math.floor(restMs / 3600000);
+      var minutos = Math.floor((restMs % 3600000) / 60000);
+      return '<div class="enc-wrap">' +
+        '<div class="enc-status" style="border-left:4px solid #ef4444">' +
+        '<span class="enc-icon">⏳</span>' +
+        '<div class="enc-txt"><strong>Intento no aprobado</strong><br>' +
+        '<span class="enc-pts" style="color:#ef4444">Podrás reintentar en ' + horas + 'h ' + minutos + 'min</span></div>' +
+        '</div></div>';
+    }
+    // Han pasado 12h → permitir reintento
+  }
+
+  // Disponible (primera vez o reintento habilitado)
+  var retryTxt = (entry && !entry.aprobado)
+    ? '<p style="font-size:.8rem;color:#10b981;margin-bottom:8px">✅ ¡Ya puedes reintentar la encuesta!</p>'
+    : '';
+
+  return '<div class="enc-wrap">' +
+    '<div class="enc-status bloq">' +
+    '<span class="enc-icon">&#128221;</span>' +
+    '<div class="enc-txt">&#161;Lee los libros y responde la encuesta para ganar puntos!<br>' +
+    '<span class="enc-pts">Hasta ' + maxPts + ' puntos disponibles &#11088;</span></div>' +
+    '</div><br>' +
+    retryTxt +
+    '<button class="enc-btn" onclick="iniciarQuiz(currentTopic)">&#128640; &#161;Iniciar encuesta!</button>' +
+    '</div>';
+}
+
+
+function iniciarQuiz(topicId) {
+  var enc = (typeof ENCUESTAS_ALL !== 'undefined') ? ENCUESTAS_ALL[topicId] : null;
+  if (!enc) return;
+  _quizState = { topicId: topicId, enc: enc, current: 0, correctas: 0, answered: false };
+  renderPregunta();
+}
+
+function renderPregunta() {
+  var s   = _quizState;
+  var enc = s.enc;
+  var q   = enc.preguntas[s.current];
+  var pct = Math.round((s.current / enc.preguntas.length) * 100);
+
+  var optsHtml = '';
+  for (var i = 0; i < q.ops.length; i++) {
+    optsHtml += '<button class="quiz-opt" onclick="responder(' + i + ')">' + q.ops[i] + '</button>';
+  }
+
+  var html =
+    '<div class="enc-wrap">' +
+    '<div class="quiz-wrap">' +
+    '<div class="quiz-progress">' +
+    '<div class="quiz-bar-bg"><div class="quiz-bar" style="width:' + pct + '%"></div></div>' +
+    '<span class="quiz-qnum">Pregunta ' + (s.current+1) + ' / ' + enc.preguntas.length + '</span>' +
+    '</div>' +
+    '<p class="quiz-q">' + q.p + '</p>' +
+    '<div class="quiz-opts">' + optsHtml + '</div>' +
+    '<div class="quiz-feedback" id="qFeedback"></div>' +
+    '<button class="quiz-next" id="qNext" onclick="siguientePregunta()">Siguiente ➡️</button>' +
+    '</div></div>';
+
+  document.getElementById('tab-encuesta').innerHTML = html;
+}
+
+function responder(idx) {
+  if (_quizState.answered) return;
+  _quizState.answered = true;
+  var q    = _quizState.enc.preguntas[_quizState.current];
+  var opts = document.querySelectorAll('.quiz-opt');
+  var fb   = document.getElementById('qFeedback');
+  var next = document.getElementById('qNext');
+
+  opts.forEach(function(b) { b.disabled = true; });
+  opts[q.r].classList.add('reveal');  // mostrar correcta
+
+  if (idx === q.r) {
+    _quizState.correctas++;
+    opts[idx].classList.add('correct');
+    fb.textContent = '✅ ¡Correcto!';
+    fb.className   = 'quiz-feedback show ok';
+  } else {
+    opts[idx].classList.add('wrong');
+    fb.textContent = '❌ Incorrecto. La respuesta correcta está marcada en verde.';
+    fb.className   = 'quiz-feedback show fail';
+  }
+  next.className = 'quiz-next show';
+}
+
+function siguientePregunta() {
+  _quizState.current++;
+  _quizState.answered = false;
+  if (_quizState.current < _quizState.enc.preguntas.length) {
+    renderPregunta();
+  } else {
+    mostrarResultado();
+  }
+}
+
+function mostrarResultado() {
+  var s      = _quizState;
+  var enc    = s.enc;
+  var aprobado = (s.correctas / enc.preguntas.length) >= 0.6;
+  var pts    = s.correctas * enc.ptsCorrecta;
+  var perfecto = s.correctas === enc.preguntas.length;
+  if (perfecto) pts += enc.ptsPerfecto;
+
+  // Solo sumar puntos si aprobó o si es la primera vez que intenta
+  var logPrev = getEncuestasLog()[s.topicId];
+  if (!logPrev || aprobado) {
+    sumarPuntosEncuesta(pts);
+  }
+  marcarEncuesta(s.topicId, pts, aprobado);
+
+  var total = (typeof getSesionPts === 'function') ? getSesionPts() : 0;
+  var pct   = Math.round((s.correctas / enc.preguntas.length) * 100);
+  var emoji = pct === 100 ? '🏆' : pct >= 60 ? '🎉' : '📖';
+  var msg   = pct === 100
+    ? '¡Perfecto! ¡Respondiste todo correctamente!'
+    : pct >= 60
+    ? '¡Muy bien! Sigue practicando para mejorar.'
+    : 'Vuelve a leer el tema. Podrás intentarlo de nuevo en <strong>12 horas</strong>.';
+  var bonusTxt = perfecto
+    ? '<p style="color:#f59e0b;font-weight:700">+' + enc.ptsPerfecto + ' puntos BONUS por puntaje perfecto 🌟</p>'
+    : '';
+  var ptsTxt = aprobado
+    ? '<div class="res-pts">+' + pts + ' puntos ⭐</div>' + bonusTxt
+    : '<div class="res-pts" style="color:#ef4444">+0 puntos — no aprobado</div>';
+
+  document.getElementById('tab-encuesta').innerHTML =
+    '<div class="enc-wrap"><div class="quiz-result">' +
+    '<span class="res-emoji">' + emoji + '</span>' +
+    '<h3>' + s.correctas + ' / ' + enc.preguntas.length + ' correctas (' + pct + '%)</h3>' +
+    ptsTxt +
+    '<p>' + msg + '</p>' +
+    (aprobado ? '<p style="font-size:.8rem;color:#999">Total acumulado: ' + total + ' pts</p>' : '') +
+    '</div></div>';
+
+  if (typeof window.refreshBadge === 'function') window.refreshBadge();
+}
+
+</script>
+
+<script>
+// ── TEMA OSCURO ──────────────────────────────────────────
+const themeBtn = document.getElementById('themeBtn');
+function applyTheme(dark){
+  document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light');
+  themeBtn.textContent = dark ? '☀️' : '🌙';
+  localStorage.setItem('biblioTheme', dark ? 'dark' : 'light');
+}
+(function(){
+  const saved = localStorage.getItem('biblioTheme');
+  applyTheme(saved === 'dark');
+})();
+function toggleTheme(){
+  const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+  applyTheme(!isDark);
+}
+
+// ── SIDEBAR MÓVIL ────────────────────────────────────────
+const sidebar = document.querySelector('.sidebar');
+const overlay = document.getElementById('sidebarOverlay');
+function toggleSidebar(){
+  sidebar.classList.toggle('open');
+  overlay.classList.toggle('open');
+  document.body.style.overflow = sidebar.classList.contains('open') ? 'hidden' : '';
+}
+// Cerrar sidebar al seleccionar tema en móvil
+const origSelect = window.selectTopic;
+window.selectTopic = function(id){
+  origSelect(id);
+  if(window.innerWidth <= 700){
+    sidebar.classList.remove('open');
+    overlay.classList.remove('open');
+    document.body.style.overflow = '';
+  }
+};
+</script>
+
+<script src="encuestas_ciencia1.js"></script>
+<script src="encuestas_ciencia2.js"></script>
+<script src="encuestas_ciencia3.js"></script>
+<script src="encuestas_ciencia4.js"></script>
+<script src="puntos.js"></script>
+<script src="mascota.js"></script>
+<!-- WIDGET DE SESIÓN -->
+<script>
+(function(){
+  // Redirigir a login si no hay sesión
+  const raw = localStorage.getItem('biblioSesion');
+  if(!raw){ window.location.href = 'login.html?next=' + encodeURIComponent(window.location.href); return; }
+  let sesion;
+  try{ sesion = JSON.parse(raw); }catch(e){ window.location.href = 'login.html'; return; }
+
+  // Inyectar badge en el header
+  const badge = document.createElement('div');
+  badge.id = 'sessionBadge';
+  badge.style.cssText = `
+    position:fixed;bottom:16px;right:16px;z-index:999;
+    background:var(--surface,#fff);border:1px solid var(--border,#e0e7ff);
+    border-radius:50px;padding:8px 14px;display:flex;align-items:center;gap:8px;
+    box-shadow:0 4px 16px rgba(0,0,0,.15);font-family:'Satoshi',sans-serif;
+    font-size:.8rem;color:var(--text,#1a1a2e);cursor:pointer;transition:.2s;
+  `;
+  const puntosActuales = sesion.puntos || 0;
+  badge.innerHTML = '<span style="font-size:1.1rem">&#128100;</span>' +
+    '<span><strong class="badge-nombre">' + sesion.nombre + '</strong><br>' +
+    '<span class="badge-pts" style="color:#f59e0b;font-weight:700">&#11088; ' + (sesion.puntos||0) + ' pts</span></span>' +
+    '<span title="Cerrar sesion" onclick="cerrarSesion()" style="margin-left:4px;opacity:.5;font-size:16px;line-height:1">&#x2715;</span>';
+  badge.onclick = function(e){ if(e.target.title !== 'Cerrar sesión') return; };
+  document.body.appendChild(badge);
+
+  window.cerrarSesion = function(){
+    if(confirm('¿Seguro que quieres cerrar sesión, ' + sesion.nombre + '?')){
+      localStorage.removeItem('biblioSesion');
+      window.location.href = 'login.html';
+    }
+  };
+})();
+</script>
+
+</body>
+</html>

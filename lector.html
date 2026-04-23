@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lector de Libros</title>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { font-family:'Segoe UI',sans-serif; background:#1a1a2e; color:#fff; height:100vh; display:flex; flex-direction:column; }
+
+  .topbar {
+    display:flex; align-items:center; gap:10px;
+    background:linear-gradient(135deg,#0f3460,#16213e);
+    padding:10px 16px; min-height:56px;
+    box-shadow:0 2px 12px rgba(0,0,0,0.4); flex-shrink:0; flex-wrap:wrap;
+  }
+  .btn-volver {
+    background:rgba(255,255,255,0.1); border:1px solid rgba(255,255,255,0.2);
+    color:#fff; padding:7px 14px; border-radius:20px; cursor:pointer;
+    font-size:13px; text-decoration:none; transition:all .2s; white-space:nowrap;
+  }
+  .btn-volver:hover { background:rgba(255,255,255,0.22); }
+  .book-title {
+    font-size:14px; font-weight:600; color:#e2e8f0;
+    flex:1; min-width:80px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+  }
+  .topbar-actions { display:flex; gap:8px; align-items:center; flex-shrink:0; }
+
+  .btn-top {
+    display:flex; align-items:center; gap:6px;
+    padding:7px 14px; border-radius:20px; border:none;
+    cursor:pointer; font-size:13px; font-weight:600;
+    transition:all .2s; white-space:nowrap;
+  }
+  .btn-download {
+    background:linear-gradient(135deg,#10b981,#059669);
+    color:#fff; box-shadow:0 2px 8px rgba(16,185,129,0.35);
+  }
+  .btn-download:hover { opacity:.88; transform:translateY(-1px); box-shadow:0 4px 14px rgba(16,185,129,0.45); }
+  .btn-open-drive {
+    background:rgba(255,255,255,0.1); border:1px solid rgba(255,255,255,0.2);
+    color:#e2e8f0;
+  }
+  .btn-open-drive:hover { background:rgba(255,255,255,0.2); }
+  .btn-fullscreen {
+    background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.15);
+    color:#e2e8f0; padding:7px 11px; border-radius:20px; cursor:pointer;
+    font-size:13px; transition:all .2s;
+  }
+  .btn-fullscreen:hover { background:rgba(255,255,255,0.18); }
+
+  .viewer-container { flex:1; position:relative; background:#2d2d2d; overflow:hidden; }
+
+  #loading {
+    position:absolute; inset:0; display:flex; flex-direction:column;
+    align-items:center; justify-content:center; background:#1a1a2e; z-index:10;
+  }
+  .spinner {
+    width:52px; height:52px; border:4px solid rgba(255,255,255,0.1);
+    border-top-color:#6c63ff; border-radius:50%;
+    animation:spin 0.8s linear infinite; margin-bottom:16px;
+  }
+  @keyframes spin { to { transform:rotate(360deg); } }
+  .loading-text { color:#a0aec0; font-size:14px; }
+
+  #pdfFrame { width:100%; height:100%; border:none; display:none; }
+
+  #errorBox {
+    display:none; position:absolute; inset:0;
+    flex-direction:column; align-items:center; justify-content:center;
+    background:#1a1a2e; gap:14px; padding:24px; text-align:center;
+  }
+  .error-icon { font-size:58px; }
+  .error-title { font-size:18px; font-weight:700; color:#fc8181; }
+  .error-msg { font-size:14px; color:#a0aec0; max-width:380px; line-height:1.6; }
+  .error-actions { display:flex; gap:10px; flex-wrap:wrap; justify-content:center; margin-top:6px; }
+  .btn-err {
+    padding:10px 22px; border-radius:22px; border:none; cursor:pointer;
+    font-size:14px; font-weight:600; transition:all .2s;
+  }
+  .btn-err-open { background:linear-gradient(135deg,#6c63ff,#a855f7); color:#fff; }
+  .btn-err-dl   { background:linear-gradient(135deg,#10b981,#059669); color:#fff; }
+  .btn-err-open:hover, .btn-err-dl:hover { opacity:.85; transform:translateY(-1px); }
+</style>
+<script>!function(){var t=localStorage.getItem("biblioTheme");document.documentElement.setAttribute("data-theme",t==="dark"?"dark":"light");}();</script>
+<script src="puntos.js"></script>
+</head>
+<body>
+
+<div class="topbar">
+  <a class="btn-volver" id="btnVolver" href="#">← Volver</a>
+  <span class="book-title" id="bookTitle">Cargando libro…</span>
+  <div class="topbar-actions">
+    <button class="btn-top btn-download" id="btnDownload" title="Descargar PDF">
+      ⬇ Descargar PDF
+    </button>
+    <button class="btn-top btn-open-drive" id="btnOpenDrive" title="Abrir en Google Drive">
+      ↗ Abrir en Drive
+    </button>
+    <button class="btn-fullscreen" onclick="toggleFS()" title="Pantalla completa">⛶</button>
+  </div>
+</div>
+
+<div class="viewer-container" id="viewerContainer">
+  <div id="loading">
+    <div class="spinner"></div>
+    <p class="loading-text">Abriendo libro…</p>
+  </div>
+  <iframe id="pdfFrame" allowfullscreen allow="autoplay"></iframe>
+  <div id="errorBox">
+    <div class="error-icon">📕</div>
+    <div class="error-title">No se pudo mostrar el libro</div>
+    <div class="error-msg">Google Drive bloqueó la vista previa en este navegador.<br>Usa los botones de arriba o los de abajo para abrirlo.</div>
+    <div class="error-actions">
+      <button class="btn-err btn-err-open" id="btnErrOpen">↗ Abrir en Drive</button>
+      <button class="btn-err btn-err-dl"   id="btnErrDl">⬇ Descargar PDF</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  const params      = new URLSearchParams(window.location.search);
+  const rawUrl      = params.get('url')   || '';
+  const title       = params.get('title') || 'Libro';
+  const back        = params.get('back')  || 'biblioteca.html';
+
+  document.getElementById('bookTitle').textContent = title;
+  document.getElementById('btnVolver').href        = back;
+
+  function getFileId(url) {
+    const m = url.match(/\/file\/d\/([^/?]+)/);
+    return m ? m[1] : null;
+  }
+  function toPreview(url)  { const id=getFileId(url); return id ? 'https://drive.google.com/file/d/'+id+'/preview' : url; }
+  function toView(url)     { const id=getFileId(url); return id ? 'https://drive.google.com/file/d/'+id+'/view'    : url; }
+  function toDownload(url) { const id=getFileId(url); return id ? 'https://drive.google.com/uc?id='+id+'&export=download' : url; }
+
+  const previewUrl  = toPreview(rawUrl);
+  const viewUrl     = toView(rawUrl);
+  const downloadUrl = toDownload(rawUrl);
+
+  // Botones siempre visibles
+  document.getElementById('btnDownload').onclick  = () => window.open(downloadUrl, '_blank');
+  document.getElementById('btnOpenDrive').onclick = () => window.open(viewUrl,     '_blank');
+  // Botones de error (duplicado por comodidad)
+  document.getElementById('btnErrOpen').onclick   = () => window.open(viewUrl,     '_blank');
+  document.getElementById('btnErrDl').onclick     = () => window.open(downloadUrl, '_blank');
+
+  const frame    = document.getElementById('pdfFrame');
+  const loading  = document.getElementById('loading');
+  const errorBox = document.getElementById('errorBox');
+
+  function showError() {
+    loading.style.display  = 'none';
+    frame.style.display    = 'none';
+    errorBox.style.display = 'flex';
+  }
+
+  if (!rawUrl) { showError(); }
+  else {
+    frame.src = previewUrl;
+    frame.onload = () => {
+      loading.style.display = 'none';
+      frame.style.display   = 'block';
+    };
+    setTimeout(() => { if (loading.style.display !== 'none') showError(); }, 10000);
+  }
+
+  function toggleFS() {
+    const el = document.getElementById('viewerContainer');
+    if (!document.fullscreenElement) { el.requestFullscreen && el.requestFullscreen(); }
+    else { document.exitFullscreen && document.exitFullscreen(); }
+  }
+</script>
+</body>
+</html>
