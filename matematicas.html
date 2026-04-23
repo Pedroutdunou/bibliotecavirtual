@@ -1,0 +1,785 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Matemáticas 4º Grado – BiblioMara</title>
+<link href="https://api.fontshare.com/v2/css?f[]=satoshi@400,500,700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --blue:#1565C0;--orange:#E65100;--green:#2E7D32;--purple:#6A1B9A;
+  --surface:#f7f6f2;--surface2:#fff;--text:#1a1a1a;--muted:#666;
+  --border:#e0e0e0;--sidebar-bg:#fff;--header-bg:linear-gradient(135deg,#1565C0,#283593);
+  --card-bg:#fff;--tab-bg:#f0f0f0;--tab-active:#fff;
+  --topic-hover:#f5f5f5;--topic-active:#E3F2FD;--topic-active-text:#1565C0;
+  --radius:10px;--shadow:0 2px 12px rgba(0,0,0,.1);
+  --font:'Satoshi',sans-serif;
+  --transition:.22s;
+}
+[data-theme="dark"]{
+  --surface:#0f0f1a;--surface2:#1a1a2e;--text:#e8e8f0;--muted:#8a8ab0;
+  --border:#2a2a45;--sidebar-bg:#16162a;--card-bg:#1e1e35;
+  --tab-bg:#1e1e35;--tab-active:#2a2a50;
+  --topic-hover:#1e1e35;--topic-active:#1e3a5f;--topic-active-text:#90CAF9;
+  --shadow:0 2px 14px rgba(0,0,0,.4);
+}
+body{font-family:var(--font);background:var(--surface);color:var(--text);display:flex;flex-direction:column;min-height:100vh;transition:background var(--transition),color var(--transition)}
+
+/* ── HEADER ── */
+.header{background:var(--header-bg);color:#fff;padding:12px 20px;display:flex;align-items:center;gap:12px;box-shadow:0 2px 8px rgba(0,0,0,.3);flex-shrink:0;min-height:60px}
+.header svg{flex-shrink:0}
+.header-title{font-size:1.15rem;font-weight:700;line-height:1.2}
+.header-sub{font-size:.78rem;opacity:.8}
+.header-right{margin-left:auto;display:flex;align-items:center;gap:8px}
+.back-btn{background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.35);color:#fff;padding:7px 14px;border-radius:20px;cursor:pointer;font-size:.82rem;transition:.2s;white-space:nowrap}
+.back-btn:hover{background:rgba(255,255,255,.32)}
+/* Hamburger */
+.hamburger{display:none;flex-direction:column;gap:5px;cursor:pointer;background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.3);padding:8px 10px;border-radius:10px}
+.hamburger span{display:block;width:20px;height:2px;background:#fff;border-radius:2px;transition:.3s}
+/* Tema toggle */
+.theme-btn{background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.3);color:#fff;width:36px;height:36px;border-radius:50%;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;transition:.2s;flex-shrink:0}
+.theme-btn:hover{background:rgba(255,255,255,.28)}
+
+/* ── LAYOUT ── */
+.main{display:flex;flex:1;overflow:hidden;height:calc(100vh - 60px)}
+
+/* ── SIDEBAR ── */
+.sidebar{width:255px;flex-shrink:0;background:var(--sidebar-bg);border-right:1px solid var(--border);overflow-y:auto;padding-bottom:24px;transition:background var(--transition),transform var(--transition)}
+.sidebar-title{padding:13px 16px;font-weight:700;font-size:.8rem;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;border-bottom:1px solid var(--border)}
+.bloque-header{padding:11px 16px;font-weight:700;font-size:.82rem;color:#fff;cursor:pointer;display:flex;align-items:center;gap:6px;user-select:none;transition:.15s}
+.bloque-header:hover{filter:brightness(.9)}
+.bloque-header .chev{margin-left:auto;transition:transform .25s;font-style:normal}
+.bloque-header.collapsed .chev{transform:rotate(-90deg)}
+.bloque-items{overflow:hidden;transition:max-height .32s ease}
+.bloque-items.collapsed{max-height:0!important}
+.topic-item{padding:10px 16px 10px 28px;font-size:.84rem;cursor:pointer;border-left:3px solid transparent;transition:.15s;color:var(--text)}
+.topic-item:hover{background:var(--topic-hover);border-left-color:#90CAF9}
+.topic-item.active{background:var(--topic-active);border-left-color:#1565C0;color:var(--topic-active-text);font-weight:600}
+
+/* Overlay móvil */
+.sidebar-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:40;backdrop-filter:blur(2px)}
+
+/* ── CONTENT ── */
+.content{flex:1;overflow-y:auto;padding:22px}
+.welcome{text-align:center;padding:60px 20px;color:var(--muted)}
+.welcome .big{font-size:3.8rem;margin-bottom:12px}
+.welcome h2{font-size:1.3rem;color:var(--text);margin-bottom:8px}
+
+/* ── TOPIC PANEL ── */
+.topic-panel{max-width:860px}
+.topic-header{display:flex;align-items:center;gap:14px;margin-bottom:18px;padding-bottom:14px;border-bottom:2px solid var(--border)}
+.topic-emoji{font-size:2.4rem}
+.topic-info h1{font-size:1.35rem;font-weight:700}
+.topic-info p{color:var(--muted);font-size:.88rem;margin-top:2px}
+
+/* ── TABS ── */
+.tabs{display:flex;gap:4px;margin-bottom:18px;background:var(--tab-bg);padding:4px;border-radius:10px}
+.tab{padding:8px 18px;border-radius:7px;cursor:pointer;font-size:.88rem;font-weight:500;transition:.2s;color:var(--muted)}
+.tab.active{background:var(--tab-active);color:#1565C0;box-shadow:0 1px 4px rgba(0,0,0,.12)}
+
+/* ── BOOK CARDS ── */
+.books-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:14px}
+.book-card{background:var(--card-bg);border-radius:var(--radius);padding:18px;box-shadow:var(--shadow);cursor:pointer;transition:.2s;border:2px solid transparent;display:flex;flex-direction:column;gap:8px}
+.book-card:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(0,0,0,.16);border-color:#1565C0}
+.book-icon{font-size:2rem}
+.book-title{font-weight:700;font-size:.93rem;line-height:1.3;color:var(--text)}
+.book-author{font-size:.78rem;color:var(--muted)}
+.book-pts{display:inline-block;background:var(--topic-active);color:#1565C0;padding:3px 10px;border-radius:20px;font-size:.76rem;font-weight:600}
+.book-btn{margin-top:auto;padding:10px;background:#1565C0;color:#fff;border:none;border-radius:8px;cursor:pointer;font-size:.84rem;font-weight:600;transition:.2s}
+.book-btn:hover{background:#0D47A1}
+
+/* VIDEO */
+.video-placeholder{text-align:center;padding:50px 20px;background:var(--card-bg);border-radius:var(--radius);box-shadow:var(--shadow);color:var(--muted)}
+.video-placeholder .icon{font-size:3rem;margin-bottom:10px}
+.video-placeholder h3{color:var(--text);font-size:1rem;margin-bottom:6px}
+
+/* ── RESPONSIVE MÓVIL ── */
+@media(max-width:700px){
+  .hamburger{display:flex}
+  .header-title{font-size:1rem}
+  .back-btn span{display:none}
+  .sidebar{
+    position:fixed;left:0;top:0;height:100%;z-index:50;
+    transform:translateX(-100%);width:78%;max-width:300px;
+    box-shadow:4px 0 24px rgba(0,0,0,.3);
+  }
+  .sidebar.open{transform:translateX(0)}
+  .sidebar-overlay.open{display:block}
+  .main{flex-direction:column;height:calc(100vh - 60px)}
+  .content{padding:14px}
+  .books-grid{grid-template-columns:1fr}
+  .topic-header{flex-direction:column;align-items:flex-start;gap:8px}
+  .topic-emoji{font-size:2rem}
+  .topic-info h1{font-size:1.15rem}
+  .tabs{overflow-x:auto;-webkit-overflow-scrolling:touch}
+  .tab{white-space:nowrap;padding:8px 14px;font-size:.82rem}
+  .book-card{padding:14px}
+  .book-btn{padding:12px;font-size:.9rem}
+}
+
+/* ── ENCUESTA ─────────────────────────────────── */
+.enc-wrap{max-width:580px;margin:0 auto}
+.enc-status{
+  display:flex;align-items:center;gap:10px;
+  background:#e8f5e9;border:1.5px solid #a5d6a7;
+  border-radius:12px;padding:14px 18px;margin-bottom:16px;
+}
+.enc-status.bloq{background:#fff3e0;border-color:#ffcc80}
+.enc-status .enc-icon{font-size:1.6rem}
+.enc-status .enc-txt{font-size:.88rem;color:#333;line-height:1.5}
+.enc-status .enc-pts{font-weight:700;color:#2e7d32;font-size:1rem}
+.enc-status.bloq .enc-pts{color:#e65100}
+.enc-btn{
+  display:inline-flex;align-items:center;gap:7px;
+  background:linear-gradient(135deg,#1976d2,#1565c0);
+  color:#fff;border:none;border-radius:10px;
+  padding:11px 22px;font-size:.9rem;font-weight:700;cursor:pointer;
+  transition:.2s;font-family:inherit;
+}
+.enc-btn:hover{transform:translateY(-2px);box-shadow:0 4px 14px rgba(25,118,210,.35)}
+.enc-btn.done{background:linear-gradient(135deg,#2e7d32,#1b5e20);cursor:default}
+.enc-btn.done:hover{transform:none;box-shadow:none}
+/* Quiz */
+.quiz-wrap{background:#fff;border-radius:14px;box-shadow:0 2px 12px rgba(0,0,0,.08);padding:22px}
+.quiz-progress{
+  display:flex;align-items:center;gap:10px;margin-bottom:18px;
+}
+.quiz-bar-bg{flex:1;height:8px;background:#e0e0e0;border-radius:4px;overflow:hidden}
+.quiz-bar{height:100%;background:linear-gradient(90deg,#1976d2,#42a5f5);border-radius:4px;transition:.4s}
+.quiz-qnum{font-size:.78rem;color:#888;white-space:nowrap}
+.quiz-q{font-size:1rem;font-weight:700;color:#1a1a1a;margin-bottom:16px;line-height:1.5}
+.quiz-opts{display:flex;flex-direction:column;gap:9px;margin-bottom:20px}
+.quiz-opt{
+  padding:12px 16px;border-radius:10px;border:2px solid #e0e0e0;
+  background:#fafafa;cursor:pointer;font-size:.9rem;
+  transition:.18s;text-align:left;font-family:inherit;color:#1a1a1a;
+}
+.quiz-opt:hover{border-color:#1976d2;background:#e3f2fd}
+.quiz-opt.correct{border-color:#2e7d32;background:#e8f5e9;color:#1b5e20;font-weight:700}
+.quiz-opt.wrong{border-color:#c62828;background:#ffebee;color:#b71c1c;font-weight:700}
+.quiz-opt.reveal{border-color:#2e7d32;background:#e8f5e9;color:#1b5e20}
+.quiz-opt:disabled{cursor:default}
+.quiz-feedback{
+  min-height:28px;font-size:.85rem;font-weight:600;
+  margin-bottom:14px;padding:8px 12px;border-radius:8px;
+  display:none;
+}
+.quiz-feedback.show{display:block}
+.quiz-feedback.ok{background:#e8f5e9;color:#2e7d32}
+.quiz-feedback.fail{background:#ffebee;color:#c62828}
+.quiz-next{
+  padding:10px 24px;background:#1976d2;color:#fff;border:none;
+  border-radius:9px;cursor:pointer;font-size:.9rem;font-weight:700;
+  font-family:inherit;transition:.2s;display:none;
+}
+.quiz-next.show{display:inline-flex;align-items:center;gap:6px}
+.quiz-next:hover{background:#1565c0}
+/* Resultado final */
+.quiz-result{text-align:center;padding:28px 16px}
+.quiz-result .res-emoji{font-size:3.5rem;display:block;margin-bottom:12px}
+.quiz-result h3{font-size:1.3rem;font-weight:700;margin-bottom:6px}
+.quiz-result .res-pts{
+  font-size:1.6rem;font-weight:900;color:#1976d2;
+  background:#e3f2fd;border-radius:12px;padding:10px 24px;
+  display:inline-block;margin:12px 0;
+}
+.quiz-result p{font-size:.88rem;color:#666;margin-bottom:18px}
+.quiz-result .enc-btn{margin:0 auto}
+
+</style>
+<script>!function(){var t=localStorage.getItem("biblioTheme");document.documentElement.setAttribute("data-theme",t==="dark"?"dark":"light");}();</script>
+<script src="encuestas_numeros.js"></script>
+<script src="encuestas_operaciones.js"></script>
+<script src="encuestas_fracciones.js"></script>
+<script src="encuestas_decimales.js"></script>
+<script src="encuestas_geometria.js"></script>
+<script src="encuestas_medidas.js"></script>
+<script src="encuestas_estadistica.js"></script>
+<script src="encuestas_resolucion.js"></script>
+<script src="puntos.js"></script>
+<script src="mascota.js"></script>
+</head>
+<body>
+<header class="header">
+  <button class="hamburger" id="hamburgerBtn" aria-label="Menú" onclick="toggleSidebar()">
+    <span></span><span></span><span></span>
+  </button>
+  <svg width="34" height="34" viewBox="0 0 36 36" fill="none">
+    <rect width="36" height="36" rx="8" fill="white" fill-opacity="0.2"/>
+    <text x="18" y="25" text-anchor="middle" font-size="20" fill="white">📐</text>
+  </svg>
+  <div>
+    <div class="header-title">Matemáticas – 4º Grado</div>
+    <div class="header-sub">BiblioMara · UEP Instituto Mara</div>
+  </div>
+  <div class="header-right">
+    <button class="theme-btn" id="themeBtn" onclick="toggleTheme()" title="Cambiar tema">🌙</button>
+    <button class="back-btn" onclick="window.location.href='biblioteca.html'">← <span>Inicio</span></button>
+  </div>
+</header>
+
+<div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+<div class="main">
+  <nav class="sidebar">
+    <div class="sidebar-title">📚 Temas</div>
+    <div class="bloque-header" onclick="toggleBloque('Números')" style="background:#1976D2">🔢 Números</div>
+<div class="bloque-items" id="bloque-Números">
+  <div class="topic-item" id="item-numnat" onclick="selectTopic('numnat')">🔢 Números Naturales</div>
+  <div class="topic-item" id="item-valpos" onclick="selectTopic('valpos')">🏛️ Valor Posicional</div>
+  <div class="topic-item" id="item-compord" onclick="selectTopic('compord')">⚖️ Comparar y Ordenar</div>
+  <div class="topic-item" id="item-parimp" onclick="selectTopic('parimp')">🔵 Pares e Impares</div>
+  <div class="topic-item" id="item-rectan" onclick="selectTopic('rectan')">📏 Recta Numérica</div>
+  <div class="topic-item" id="item-numore" onclick="selectTopic('numore')">🥇 Números Ordinales</div>
+  <div class="topic-item" id="item-nurom" onclick="selectTopic('nurom')">🏛️ Números Romanos</div>
+</div>
+<div class="bloque-header" onclick="toggleBloque('Operaciones')" style="background:#E65100">➕ Operaciones</div>
+<div class="bloque-items" id="bloque-Operaciones">
+  <div class="topic-item" id="item-suma" onclick="selectTopic('suma')">➕ Suma con Llevada</div>
+  <div class="topic-item" id="item-resta" onclick="selectTopic('resta')">➖ Resta con Préstamo</div>
+  <div class="topic-item" id="item-calmen" onclick="selectTopic('calmen')">🧠 Cálculo Mental</div>
+  <div class="topic-item" id="item-probsr" onclick="selectTopic('probsr')">🧩 Problemas Suma y Resta</div>
+  <div class="topic-item" id="item-tabmul" onclick="selectTopic('tabmul')">✖️ Tablas de Multiplicar</div>
+  <div class="topic-item" id="item-mul2" onclick="selectTopic('mul2')">✖️ Multiplicar 2 Cifras</div>
+  <div class="topic-item" id="item-mul3" onclick="selectTopic('mul3')">✖️ Multiplicar 3 Cifras</div>
+  <div class="topic-item" id="item-propmu" onclick="selectTopic('propmu')">📝 Propiedades Multiplicación</div>
+  <div class="topic-item" id="item-probmu" onclick="selectTopic('probmu')">🧩 Problemas de Multiplicación</div>
+  <div class="topic-item" id="item-div1" onclick="selectTopic('div1')">➗ División por 1 Cifra</div>
+  <div class="topic-item" id="item-div2" onclick="selectTopic('div2')">➗ División por 2 Cifras</div>
+  <div class="topic-item" id="item-relmul" onclick="selectTopic('relmul')">🔁 Relación Mult.÷Div.</div>
+  <div class="topic-item" id="item-probdi" onclick="selectTopic('probdi')">🧩 Problemas de División</div>
+</div>
+<div class="bloque-header" onclick="toggleBloque('Fracciones')" style="background:#7B1FA2">½ Fracciones</div>
+<div class="bloque-items" id="bloque-Fracciones">
+  <div class="topic-item" id="item-frac" onclick="selectTopic('frac')">½ ¿Qué es una Fracción?</div>
+  <div class="topic-item" id="item-fracequiv" onclick="selectTopic('fracequiv')">≈ Fracciones Equivalentes</div>
+  <div class="topic-item" id="item-compfrac" onclick="selectTopic('compfrac')">⚖️ Comparar Fracciones</div>
+  <div class="topic-item" id="item-opfrac" onclick="selectTopic('opfrac')">➕ Suma y Resta de Fracciones</div>
+</div>
+<div class="bloque-header" onclick="toggleBloque('Decimales')" style="background:#00838F">🔢 Decimales</div>
+<div class="bloque-items" id="bloque-Decimales">
+  <div class="topic-item" id="item-decimal" onclick="selectTopic('decimal')">🔢 Décimas y Centésimas</div>
+  <div class="topic-item" id="item-lecdec" onclick="selectTopic('lecdec')">📖 Leer y Escribir Decimales</div>
+  <div class="topic-item" id="item-opdec" onclick="selectTopic('opdec')">➕ Suma y Resta de Decimales</div>
+</div>
+<div class="bloque-header" onclick="toggleBloque('Geometría')" style="background:#2E7D32">📐 Geometría</div>
+<div class="bloque-items" id="bloque-Geometría">
+  <div class="topic-item" id="item-polig" onclick="selectTopic('polig')">🔷 Polígonos y Figuras Planas</div>
+  <div class="topic-item" id="item-cuerpos3d" onclick="selectTopic('cuerpos3d')">📦 Cuerpos Geométricos 3D</div>
+  <div class="topic-item" id="item-angulos" onclick="selectTopic('angulos')">📐 Ángulos</div>
+  <div class="topic-item" id="item-lineas" onclick="selectTopic('lineas')">📏 Líneas Paralelas y Perp.</div>
+  <div class="topic-item" id="item-perim" onclick="selectTopic('perim')">📐 Perímetro</div>
+  <div class="topic-item" id="item-area" onclick="selectTopic('area')">🔳 Área</div>
+  <div class="topic-item" id="item-simetria" onclick="selectTopic('simetria')">🪞 Simetría</div>
+  <div class="topic-item" id="item-oresp" onclick="selectTopic('oresp')">🧭 Orientación Espacial</div>
+</div>
+<div class="bloque-header" onclick="toggleBloque('Medidas')" style="background:#C62828">📏 Medidas</div>
+<div class="bloque-items" id="bloque-Medidas">
+  <div class="topic-item" id="item-longit" onclick="selectTopic('longit')">📏 Longitud (cm, m, km)</div>
+  <div class="topic-item" id="item-masa" onclick="selectTopic('masa')">⚖️ Masa (g y kg)</div>
+  <div class="topic-item" id="item-capac" onclick="selectTopic('capac')">💧 Capacidad (mL y L)</div>
+  <div class="topic-item" id="item-tiempo" onclick="selectTopic('tiempo')">🕐 Unidades de Tiempo</div>
+  <div class="topic-item" id="item-temp" onclick="selectTopic('temp')">🌡️ Temperatura</div>
+  <div class="topic-item" id="item-sismtec" onclick="selectTopic('sismtec')">📋 Sistema Métrico Decimal</div>
+  <div class="topic-item" id="item-monetar" onclick="selectTopic('monetar')">💰 Sistema Monetario</div>
+</div>
+<div class="bloque-header" onclick="toggleBloque('Estadística')" style="background:#E65100">📊 Estadística</div>
+<div class="bloque-items" id="bloque-Estadística">
+  <div class="topic-item" id="item-tablas" onclick="selectTopic('tablas')">📊 Tablas de Datos</div>
+  <div class="topic-item" id="item-barras" onclick="selectTopic('barras')">📊 Gráficos de Barras</div>
+  <div class="topic-item" id="item-picto" onclick="selectTopic('picto')">🖼️ Pictogramas</div>
+  <div class="topic-item" id="item-proba" onclick="selectTopic('proba')">🎲 Probabilidad Básica</div>
+</div>
+<div class="bloque-header" onclick="toggleBloque('Resolución')" style="background:#37474F">🧩 Resolución</div>
+<div class="bloque-items" id="bloque-Resolución">
+  <div class="topic-item" id="item-estrat" onclick="selectTopic('estrat')">🎯 Estrategias de Resolución</div>
+  <div class="topic-item" id="item-prob1op" onclick="selectTopic('prob1op')">1️⃣ Problemas: 1 Operación</div>
+  <div class="topic-item" id="item-prob2op" onclick="selectTopic('prob2op')">2️⃣ Problemas: 2 Operaciones</div>
+  <div class="topic-item" id="item-probcot" onclick="selectTopic('probcot')">🏪 Problemas Cotidianos</div>
+</div>
+
+  </nav>
+  <main class="content" id="content">
+    <div class="welcome">
+      <div class="big">📐</div>
+      <h2>¡Bienvenido a Matemáticas!</h2>
+      <p>Selecciona un tema del menú lateral para ver los libros disponibles.</p>
+      <p style="margin-top:8px;font-size:.85rem">50 temas · 150 libros · 8 bloques</p>
+    </div>
+  </main>
+</div>
+
+<script>
+const LIBROS = {
+  "numnat": [{"title": "Contando con los recursos – Bicentenario", "author": "MPPE 4º", "url": "https://drive.google.com/file/d/1iZOKSOfCZmT7wU1-PGKI9NHIy5aRJsW5/preview", "icon": "📗", "pts": 20}, {"title": "Actividades de Matemática 4º", "author": "MPPE", "url": "https://drive.google.com/file/d/12uXf_QWzWkYCezQmVbmGzNINBwgMnYTE/preview", "icon": "📘", "pts": 20}, {"title": "Cuaderno: Números Naturales", "author": "Colección primaria", "url": "https://drive.google.com/file/d/1aV9vzrAqWdfwilmW9kpLjXlFiGlZsctW/preview", "icon": "🔢", "pts": 15}],
+  "valpos": [{"title": "Contando con los recursos – Bicentenario", "author": "MPPE 4º", "url": "https://drive.google.com/file/d/1iZOKSOfCZmT7wU1-PGKI9NHIy5aRJsW5/preview", "icon": "📗", "pts": 20}, {"title": "Actividades de Matemática 4º", "author": "MPPE", "url": "https://drive.google.com/file/d/12uXf_QWzWkYCezQmVbmGzNINBwgMnYTE/preview", "icon": "📘", "pts": 20}, {"title": "Valor Posicional – Matemáticas 4to", "author": "Docentes", "url": "https://drive.google.com/file/d/17iGlvYn_tNfCCMiuI4Kgi1F87jTakN9R/preview", "icon": "🔢", "pts": 15}],
+  "compord": [{"title": "Contando con los recursos – Bicentenario", "author": "MPPE 4º", "url": "https://drive.google.com/file/d/1iZOKSOfCZmT7wU1-PGKI9NHIy5aRJsW5/preview", "icon": "📗", "pts": 20}, {"title": "Segunda Cartilla – Matemáticas 4º", "author": "GUAO", "url": "https://drive.google.com/file/d/1nr5BPGIqVr4KvCbrD2x4oX2YOI28P-oX/preview", "icon": "📙", "pts": 20}, {"title": "Práctica general 4º Primaria", "author": "Yo quiero aprobar", "url": "https://drive.google.com/file/d/1yDNiHhVKzazoH8g2Kmrdy4zLny0S9rUk/preview", "icon": "✏️", "pts": 15}],
+  "parimp": [{"title": "Contando con los recursos – Bicentenario", "author": "MPPE 4º", "url": "https://drive.google.com/file/d/1iZOKSOfCZmT7wU1-PGKI9NHIy5aRJsW5/preview", "icon": "📗", "pts": 20}, {"title": "Actividades de Matemática 4º", "author": "MPPE", "url": "https://drive.google.com/file/d/12uXf_QWzWkYCezQmVbmGzNINBwgMnYTE/preview", "icon": "📘", "pts": 20}, {"title": "Práctica general 4º Primaria", "author": "Yo quiero aprobar", "url": "https://drive.google.com/file/d/1yDNiHhVKzazoH8g2Kmrdy4zLny0S9rUk/preview", "icon": "✏️", "pts": 15}],
+  "rectan": [{"title": "Contando con los recursos – Bicentenario", "author": "MPPE 4º", "url": "https://drive.google.com/file/d/1iZOKSOfCZmT7wU1-PGKI9NHIy5aRJsW5/preview", "icon": "📗", "pts": 20}, {"title": "Segunda Cartilla – Matemáticas 4º", "author": "GUAO", "url": "https://drive.google.com/file/d/1nr5BPGIqVr4KvCbrD2x4oX2YOI28P-oX/preview", "icon": "📙", "pts": 20}, {"title": "Valor Posicional – Matemáticas 4to", "author": "Docentes", "url": "https://drive.google.com/file/d/17iGlvYn_tNfCCMiuI4Kgi1F87jTakN9R/preview", "icon": "🔢", "pts": 15}],
+  "numore": [{"title": "Contando con los recursos – Bicentenario", "author": "MPPE 4º", "url": "https://drive.google.com/file/d/1iZOKSOfCZmT7wU1-PGKI9NHIy5aRJsW5/preview", "icon": "📗", "pts": 20}, {"title": "Actividades de Matemática 4º", "author": "MPPE", "url": "https://drive.google.com/file/d/12uXf_QWzWkYCezQmVbmGzNINBwgMnYTE/preview", "icon": "📘", "pts": 20}, {"title": "Cuaderno: Números Ordinales", "author": "Colección primaria", "url": "https://drive.google.com/file/d/15ikgBdLYrhfMEOIxO2f2UVyu3SnqqPIE/preview", "icon": "🏆", "pts": 15}],
+  "nurom": [{"title": "Contando con los recursos – Bicentenario", "author": "MPPE 4º", "url": "https://drive.google.com/file/d/1iZOKSOfCZmT7wU1-PGKI9NHIy5aRJsW5/preview", "icon": "📗", "pts": 20}, {"title": "Actividades de Matemática 4º", "author": "MPPE", "url": "https://drive.google.com/file/d/12uXf_QWzWkYCezQmVbmGzNINBwgMnYTE/preview", "icon": "📘", "pts": 20}, {"title": "Cuaderno: Números Romanos", "author": "Colección primaria", "url": "https://drive.google.com/file/d/1GDrIG1Fcmc7SFYTEqsWSmqV2226Sbfrz/preview", "icon": "🏛️", "pts": 15}],
+  "suma": [{"title": "Contando con los recursos – Bicentenario", "author": "MPPE 4º", "url": "https://drive.google.com/file/d/1iZOKSOfCZmT7wU1-PGKI9NHIy5aRJsW5/preview", "icon": "📗", "pts": 20}, {"title": "Operaciones y Problemas", "author": "SEP", "url": "https://drive.google.com/file/d/1P7-qKw98cmR93j2qyEZmt4sRreLv1QIR/preview", "icon": "➕", "pts": 20}, {"title": "Cuaderno: Sumar 6 y 7 cifras", "author": "Colección primaria", "url": "https://drive.google.com/file/d/1cXV6JY96-FS_HjHbuZAdibHGHEG17A7F/preview", "icon": "🔢", "pts": 15}],
+  "resta": [{"title": "Contando con los recursos – Bicentenario", "author": "MPPE 4º", "url": "https://drive.google.com/file/d/1iZOKSOfCZmT7wU1-PGKI9NHIy5aRJsW5/preview", "icon": "📗", "pts": 20}, {"title": "Operaciones y Problemas", "author": "SEP", "url": "https://drive.google.com/file/d/1P7-qKw98cmR93j2qyEZmt4sRreLv1QIR/preview", "icon": "➖", "pts": 20}, {"title": "Cuaderno: Restar 6 y 7 cifras", "author": "Colección primaria", "url": "https://drive.google.com/file/d/1EaWPoRXieDP72ELs_TJZiBKdZDwOGhhm/preview", "icon": "🔢", "pts": 15}],
+  "calmen": [{"title": "Contando con los recursos – Bicentenario", "author": "MPPE 4º", "url": "https://drive.google.com/file/d/1iZOKSOfCZmT7wU1-PGKI9NHIy5aRJsW5/preview", "icon": "📗", "pts": 20}, {"title": "Segunda Cartilla – Matemáticas 4º", "author": "GUAO", "url": "https://drive.google.com/file/d/1nr5BPGIqVr4KvCbrD2x4oX2YOI28P-oX/preview", "icon": "📙", "pts": 20}, {"title": "Cálculo mental 4º Primaria", "author": "Materias 4º", "url": "https://drive.google.com/file/d/1cXV6JY96-FS_HjHbuZAdibHGHEG17A7F/preview", "icon": "🧠", "pts": 15}],
+  "probsr": [{"title": "Actividades de Matemática 4º", "author": "MPPE", "url": "https://drive.google.com/file/d/12uXf_QWzWkYCezQmVbmGzNINBwgMnYTE/preview", "icon": "📘", "pts": 20}, {"title": "Colección de problemas 4º", "author": "Orientación Andújar", "url": "https://drive.google.com/file/d/17P5M0Iw18Rqhh5tmvXDILlMm-HSU1o2d/preview", "icon": "🧩", "pts": 20}, {"title": "Práctica general 4º Primaria", "author": "Yo quiero aprobar", "url": "https://drive.google.com/file/d/1yDNiHhVKzazoH8g2Kmrdy4zLny0S9rUk/preview", "icon": "✏️", "pts": 15}],
+  "tabmul": [{"title": "Contando con los recursos – Bicentenario", "author": "MPPE 4º", "url": "https://drive.google.com/file/d/1iZOKSOfCZmT7wU1-PGKI9NHIy5aRJsW5/preview", "icon": "📗", "pts": 20}, {"title": "Operaciones y Problemas", "author": "SEP", "url": "https://drive.google.com/file/d/1P7-qKw98cmR93j2qyEZmt4sRreLv1QIR/preview", "icon": "✖️", "pts": 20}, {"title": "Cuaderno: Multiplicar por 1 cifra", "author": "Colección primaria", "url": "https://drive.google.com/file/d/1MWcPqQugSLOEk-jlRSamOLrrGm7C2sAC/preview", "icon": "🔢", "pts": 15}],
+  "mul2": [{"title": "Contando con los recursos – Bicentenario", "author": "MPPE 4º", "url": "https://drive.google.com/file/d/1iZOKSOfCZmT7wU1-PGKI9NHIy5aRJsW5/preview", "icon": "📗", "pts": 20}, {"title": "Operaciones y Problemas", "author": "SEP", "url": "https://drive.google.com/file/d/1P7-qKw98cmR93j2qyEZmt4sRreLv1QIR/preview", "icon": "✖️", "pts": 20}, {"title": "Cuaderno: Multiplicar por 2 cifras", "author": "Colección primaria", "url": "https://drive.google.com/file/d/10wGEw223BJn_dRU9NllgvQPPXo-AA_sg/preview", "icon": "🔢", "pts": 15}],
+  "mul3": [{"title": "Contando con los recursos – Bicentenario", "author": "MPPE 4º", "url": "https://drive.google.com/file/d/1iZOKSOfCZmT7wU1-PGKI9NHIy5aRJsW5/preview", "icon": "📗", "pts": 20}, {"title": "Segunda Cartilla – Matemáticas 4º", "author": "GUAO", "url": "https://drive.google.com/file/d/1nr5BPGIqVr4KvCbrD2x4oX2YOI28P-oX/preview", "icon": "📙", "pts": 20}, {"title": "Cuaderno: Multiplicar por 3 cifras", "author": "Colección primaria", "url": "https://drive.google.com/file/d/1RXnCeOo3eeVmxfZQ-ZKmEe7musDDPRa4/preview", "icon": "🔢", "pts": 15}],
+  "propmu": [{"title": "Contando con los recursos – Bicentenario", "author": "MPPE 4º", "url": "https://drive.google.com/file/d/1iZOKSOfCZmT7wU1-PGKI9NHIy5aRJsW5/preview", "icon": "📗", "pts": 20}, {"title": "Actividades de Matemática 4º", "author": "MPPE", "url": "https://drive.google.com/file/d/12uXf_QWzWkYCezQmVbmGzNINBwgMnYTE/preview", "icon": "📘", "pts": 20}, {"title": "Práctica general 4º Primaria", "author": "Yo quiero aprobar", "url": "https://drive.google.com/file/d/1yDNiHhVKzazoH8g2Kmrdy4zLny0S9rUk/preview", "icon": "✏️", "pts": 15}],
+  "probmu": [{"title": "Actividades de Matemática 4º", "author": "MPPE", "url": "https://drive.google.com/file/d/12uXf_QWzWkYCezQmVbmGzNINBwgMnYTE/preview", "icon": "📘", "pts": 20}, {"title": "Colección de problemas 4º", "author": "Orientación Andújar", "url": "https://drive.google.com/file/d/17P5M0Iw18Rqhh5tmvXDILlMm-HSU1o2d/preview", "icon": "🧩", "pts": 20}, {"title": "Cuaderno: Multiplicar por 2 cifras", "author": "Colección primaria", "url": "https://drive.google.com/file/d/10wGEw223BJn_dRU9NllgvQPPXo-AA_sg/preview", "icon": "🔢", "pts": 15}],
+  "div1": [{"title": "Contando con los recursos – Bicentenario", "author": "MPPE 4º", "url": "https://drive.google.com/file/d/1iZOKSOfCZmT7wU1-PGKI9NHIy5aRJsW5/preview", "icon": "📗", "pts": 20}, {"title": "Operaciones y Problemas", "author": "SEP", "url": "https://drive.google.com/file/d/1P7-qKw98cmR93j2qyEZmt4sRreLv1QIR/preview", "icon": "➗", "pts": 20}, {"title": "Cuaderno: Dividir por 1 cifra", "author": "Colección primaria", "url": "https://drive.google.com/file/d/17omr0qXIsfLemh_qshtdURmvG_r1KRlx/preview", "icon": "🔢", "pts": 15}],
+  "div2": [{"title": "Contando con los recursos – Bicentenario", "author": "MPPE 4º", "url": "https://drive.google.com/file/d/1iZOKSOfCZmT7wU1-PGKI9NHIy5aRJsW5/preview", "icon": "📗", "pts": 20}, {"title": "Operaciones y Problemas", "author": "SEP", "url": "https://drive.google.com/file/d/1P7-qKw98cmR93j2qyEZmt4sRreLv1QIR/preview", "icon": "➗", "pts": 20}, {"title": "Cuaderno: Dividir por 2 cifras", "author": "Colección primaria", "url": "https://drive.google.com/file/d/1CLRcwuDayjLE2ZFvbVpi-lfqmidYYz8Q/preview", "icon": "🔢", "pts": 15}],
+  "relmul": [{"title": "Contando con los recursos – Bicentenario", "author": "MPPE 4º", "url": "https://drive.google.com/file/d/1iZOKSOfCZmT7wU1-PGKI9NHIy5aRJsW5/preview", "icon": "📗", "pts": 20}, {"title": "Segunda Cartilla – Matemáticas 4º", "author": "GUAO", "url": "https://drive.google.com/file/d/1nr5BPGIqVr4KvCbrD2x4oX2YOI28P-oX/preview", "icon": "📙", "pts": 20}, {"title": "Práctica general 4º Primaria", "author": "Yo quiero aprobar", "url": "https://drive.google.com/file/d/1yDNiHhVKzazoH8g2Kmrdy4zLny0S9rUk/preview", "icon": "✏️", "pts": 15}],
+  "probdi": [{"title": "Actividades de Matemática 4º", "author": "MPPE", "url": "https://drive.google.com/file/d/12uXf_QWzWkYCezQmVbmGzNINBwgMnYTE/preview", "icon": "📘", "pts": 20}, {"title": "Colección de problemas 4º", "author": "Orientación Andújar", "url": "https://drive.google.com/file/d/17P5M0Iw18Rqhh5tmvXDILlMm-HSU1o2d/preview", "icon": "🧩", "pts": 20}, {"title": "Cuaderno: Dividir por 1 cifra", "author": "Colección primaria", "url": "https://drive.google.com/file/d/17omr0qXIsfLemh_qshtdURmvG_r1KRlx/preview", "icon": "🔢", "pts": 15}],
+  "frac": [{"title": "Contando con los recursos – Bicentenario", "author": "MPPE 4º", "url": "https://drive.google.com/file/d/1iZOKSOfCZmT7wU1-PGKI9NHIy5aRJsW5/preview", "icon": "📗", "pts": 20}, {"title": "Fracciones y Decimales – Docente", "author": "4º grado", "url": "https://drive.google.com/file/d/1EqloJI1yJoQob1xDQXIRaXZNTRzXbDea/preview", "icon": "📐", "pts": 20}, {"title": "Cuaderno: Números Fraccionarios", "author": "Colección primaria", "url": "https://drive.google.com/file/d/1YeJmz2nrgSy4ZFFBopGQb5XuUeyuSOpw/preview", "icon": "½", "pts": 15}],
+  "fracequiv": [{"title": "Segunda Cartilla – Matemáticas 4º", "author": "GUAO", "url": "https://drive.google.com/file/d/1nr5BPGIqVr4KvCbrD2x4oX2YOI28P-oX/preview", "icon": "📙", "pts": 20}, {"title": "Fracciones y Decimales – Docente", "author": "4º grado", "url": "https://drive.google.com/file/d/1EqloJI1yJoQob1xDQXIRaXZNTRzXbDea/preview", "icon": "📐", "pts": 20}, {"title": "Repaso de Fracciones 4º", "author": "CEIP", "url": "https://drive.google.com/file/d/1w15HRhajHdtQmQy9Nk86Czn16nt3duvD/preview", "icon": "½", "pts": 15}],
+  "compfrac": [{"title": "Actividades de Matemática 4º", "author": "MPPE", "url": "https://drive.google.com/file/d/12uXf_QWzWkYCezQmVbmGzNINBwgMnYTE/preview", "icon": "📘", "pts": 20}, {"title": "Cuaderno: Números Fraccionarios", "author": "Colección primaria", "url": "https://drive.google.com/file/d/1YeJmz2nrgSy4ZFFBopGQb5XuUeyuSOpw/preview", "icon": "½", "pts": 20}, {"title": "Repaso de Fracciones 4º", "author": "CEIP", "url": "https://drive.google.com/file/d/1w15HRhajHdtQmQy9Nk86Czn16nt3duvD/preview", "icon": "📋", "pts": 15}],
+  "opfrac": [{"title": "Contando con los recursos – Bicentenario", "author": "MPPE 4º", "url": "https://drive.google.com/file/d/1iZOKSOfCZmT7wU1-PGKI9NHIy5aRJsW5/preview", "icon": "📗", "pts": 20}, {"title": "Cuaderno: Números Fraccionarios", "author": "Colección primaria", "url": "https://drive.google.com/file/d/1YeJmz2nrgSy4ZFFBopGQb5XuUeyuSOpw/preview", "icon": "½", "pts": 20}, {"title": "Repaso de Fracciones 4º", "author": "CEIP", "url": "https://drive.google.com/file/d/1w15HRhajHdtQmQy9Nk86Czn16nt3duvD/preview", "icon": "📋", "pts": 15}],
+  "decimal": [{"title": "Contando con los recursos – Bicentenario", "author": "MPPE 4º", "url": "https://drive.google.com/file/d/1iZOKSOfCZmT7wU1-PGKI9NHIy5aRJsW5/preview", "icon": "📗", "pts": 20}, {"title": "Fracciones y Decimales – Docente", "author": "4º grado", "url": "https://drive.google.com/file/d/1EqloJI1yJoQob1xDQXIRaXZNTRzXbDea/preview", "icon": "📐", "pts": 20}, {"title": "Cuaderno: Números Decimales", "author": "Colección primaria", "url": "https://drive.google.com/file/d/1MSdmJajbN09cnLdk3HDGG_m643FmVbu5/preview", "icon": "🔢", "pts": 15}],
+  "lecdec": [{"title": "Segunda Cartilla – Matemáticas 4º", "author": "GUAO", "url": "https://drive.google.com/file/d/1nr5BPGIqVr4KvCbrD2x4oX2YOI28P-oX/preview", "icon": "📙", "pts": 20}, {"title": "Cuaderno: Números Decimales", "author": "Colección primaria", "url": "https://drive.google.com/file/d/1MSdmJajbN09cnLdk3HDGG_m643FmVbu5/preview", "icon": "🔢", "pts": 20}, {"title": "Fracciones y Decimales – Docente", "author": "4º grado", "url": "https://drive.google.com/file/d/1EqloJI1yJoQob1xDQXIRaXZNTRzXbDea/preview", "icon": "📐", "pts": 15}],
+  "opdec": [{"title": "Actividades de Matemática 4º", "author": "MPPE", "url": "https://drive.google.com/file/d/12uXf_QWzWkYCezQmVbmGzNINBwgMnYTE/preview", "icon": "📘", "pts": 20}, {"title": "Cuaderno: Números Decimales", "author": "Colección primaria", "url": "https://drive.google.com/file/d/1MSdmJajbN09cnLdk3HDGG_m643FmVbu5/preview", "icon": "🔢", "pts": 20}, {"title": "Práctica general 4º Primaria", "author": "Yo quiero aprobar", "url": "https://drive.google.com/file/d/1yDNiHhVKzazoH8g2Kmrdy4zLny0S9rUk/preview", "icon": "✏️", "pts": 15}],
+  "polig": [{"title": "Contando con los recursos – Bicentenario", "author": "MPPE 4º", "url": "https://drive.google.com/file/d/1iZOKSOfCZmT7wU1-PGKI9NHIy5aRJsW5/preview", "icon": "📗", "pts": 20}, {"title": "Geometría bi y tridimensional", "author": "Fundación Valle del Lili", "url": "https://drive.google.com/file/d/1eDtQk4PiSK3B02R2FNKLV793fmekngXA/preview", "icon": "🔷", "pts": 20}, {"title": "Cuaderno: Formas Planas", "author": "Colección primaria", "url": "https://drive.google.com/file/d/19Le6ZJEhiz9ITYoTC6UvFzbpJvOIzTtU/preview", "icon": "🔶", "pts": 15}],
+  "cuerpos3d": [{"title": "Segunda Cartilla – Matemáticas 4º", "author": "GUAO", "url": "https://drive.google.com/file/d/1nr5BPGIqVr4KvCbrD2x4oX2YOI28P-oX/preview", "icon": "📙", "pts": 20}, {"title": "Figuras 3D recortables", "author": "GoStudent", "url": "https://drive.google.com/file/d/1W1FAP177h0Oa-cJblwFN-xd1_MBTbKGs/preview", "icon": "📦", "pts": 20}, {"title": "Cuaderno: Cuerpos Geométricos", "author": "Colección primaria", "url": "https://drive.google.com/file/d/1XxFpTIXwse2AZIZw62SwUB_pI4OtSl7e/preview", "icon": "🔮", "pts": 15}],
+  "angulos": [{"title": "Contando con los recursos – Bicentenario", "author": "MPPE 4º", "url": "https://drive.google.com/file/d/1iZOKSOfCZmT7wU1-PGKI9NHIy5aRJsW5/preview", "icon": "📗", "pts": 20}, {"title": "Guía: Líneas paralelas y perpendiculares", "author": "Colegio", "url": "https://drive.google.com/file/d/11riEWx0rWK5KVbBzMkd6oojqUvzI-rUh/preview", "icon": "📐", "pts": 20}, {"title": "Cuaderno: Clasificación de Ángulos", "author": "Colección primaria", "url": "https://drive.google.com/file/d/1pwxxo-czmS3Q6Le4vYywOgh5DO5KARh-/preview", "icon": "📐", "pts": 15}],
+  "lineas": [{"title": "Actividades de Matemática 4º", "author": "MPPE", "url": "https://drive.google.com/file/d/12uXf_QWzWkYCezQmVbmGzNINBwgMnYTE/preview", "icon": "📘", "pts": 20}, {"title": "Líneas Paralelas y Perpendiculares", "author": "Fundación Valle del Lili", "url": "https://drive.google.com/file/d/10VAXD2kPTEetu80FaIjtT_NcX3ky8Ec4/preview", "icon": "📏", "pts": 20}, {"title": "Guía: Líneas paralelas y perpendiculares", "author": "Colegio", "url": "https://drive.google.com/file/d/11riEWx0rWK5KVbBzMkd6oojqUvzI-rUh/preview", "icon": "📐", "pts": 15}],
+  "perim": [{"title": "Contando con los recursos – Bicentenario", "author": "MPPE 4º", "url": "https://drive.google.com/file/d/1iZOKSOfCZmT7wU1-PGKI9NHIy5aRJsW5/preview", "icon": "📗", "pts": 20}, {"title": "Actividades de Matemática 4º", "author": "MPPE", "url": "https://drive.google.com/file/d/12uXf_QWzWkYCezQmVbmGzNINBwgMnYTE/preview", "icon": "📘", "pts": 20}, {"title": "Cuaderno: Perímetro de Polígonos", "author": "Colección primaria", "url": "https://drive.google.com/file/d/1INvyiX0WCDTDLWjZ3yLrJcXt6egp_hYS/preview", "icon": "📏", "pts": 15}],
+  "area": [{"title": "Segunda Cartilla – Matemáticas 4º", "author": "GUAO", "url": "https://drive.google.com/file/d/1nr5BPGIqVr4KvCbrD2x4oX2YOI28P-oX/preview", "icon": "📙", "pts": 20}, {"title": "Geometría bi y tridimensional", "author": "Fundación Valle del Lili", "url": "https://drive.google.com/file/d/1eDtQk4PiSK3B02R2FNKLV793fmekngXA/preview", "icon": "🔷", "pts": 20}, {"title": "Cuaderno: Perímetro de Polígonos", "author": "Colección primaria", "url": "https://drive.google.com/file/d/1INvyiX0WCDTDLWjZ3yLrJcXt6egp_hYS/preview", "icon": "📏", "pts": 15}],
+  "simetria": [{"title": "Actividades de Matemática 4º", "author": "MPPE", "url": "https://drive.google.com/file/d/12uXf_QWzWkYCezQmVbmGzNINBwgMnYTE/preview", "icon": "📘", "pts": 20}, {"title": "Geometría bi y tridimensional", "author": "Fundación Valle del Lili", "url": "https://drive.google.com/file/d/1eDtQk4PiSK3B02R2FNKLV793fmekngXA/preview", "icon": "🔷", "pts": 20}, {"title": "Cuaderno: Simetría", "author": "Colección primaria", "url": "https://drive.google.com/file/d/1ptzvLcgVTQYshRYI1Xhsq8zkTxWVMcuy/preview", "icon": "🪞", "pts": 15}],
+  "oresp": [{"title": "Contando con los recursos – Bicentenario", "author": "MPPE 4º", "url": "https://drive.google.com/file/d/1iZOKSOfCZmT7wU1-PGKI9NHIy5aRJsW5/preview", "icon": "📗", "pts": 20}, {"title": "Actividades de Matemática 4º", "author": "MPPE", "url": "https://drive.google.com/file/d/12uXf_QWzWkYCezQmVbmGzNINBwgMnYTE/preview", "icon": "📘", "pts": 20}, {"title": "Cuaderno: Orientación Espacial", "author": "Colección primaria", "url": "https://drive.google.com/file/d/1-iTxBqga0DZzn8r65OsGSnL0tweeGn-m/preview", "icon": "🧭", "pts": 15}],
+  "longit": [{"title": "Contando con los recursos – Bicentenario", "author": "MPPE 4º", "url": "https://drive.google.com/file/d/1iZOKSOfCZmT7wU1-PGKI9NHIy5aRJsW5/preview", "icon": "📗", "pts": 20}, {"title": "Aprendemos a medir", "author": "IESOJA", "url": "https://drive.google.com/file/d/1_GmFNrhUc5a_uixrK10avTA25pl8k9gv/preview", "icon": "📏", "pts": 20}, {"title": "Cuaderno: Unidades de Longitud", "author": "Colección primaria", "url": "https://drive.google.com/file/d/1_GmFNrhUc5a_uixrK10avTA25pl8k9gv/preview", "icon": "📐", "pts": 15}],
+  "masa": [{"title": "Segunda Cartilla – Matemáticas 4º", "author": "GUAO", "url": "https://drive.google.com/file/d/1nr5BPGIqVr4KvCbrD2x4oX2YOI28P-oX/preview", "icon": "📙", "pts": 20}, {"title": "Aprendemos a medir", "author": "IESOJA", "url": "https://drive.google.com/file/d/1_GmFNrhUc5a_uixrK10avTA25pl8k9gv/preview", "icon": "⚖️", "pts": 20}, {"title": "Cuaderno: Unidades de Masa y Peso", "author": "Colección primaria", "url": "https://drive.google.com/file/d/1H5DN8B64JUH9RaH-KEZHZ8Nb82HziHG-/preview", "icon": "🔩", "pts": 15}],
+  "capac": [{"title": "Actividades de Matemática 4º", "author": "MPPE", "url": "https://drive.google.com/file/d/12uXf_QWzWkYCezQmVbmGzNINBwgMnYTE/preview", "icon": "📘", "pts": 20}, {"title": "Aprendemos a medir", "author": "IESOJA", "url": "https://drive.google.com/file/d/1_GmFNrhUc5a_uixrK10avTA25pl8k9gv/preview", "icon": "🥛", "pts": 20}, {"title": "Cuaderno: Unidades de Capacidad", "author": "Colección primaria", "url": "https://drive.google.com/file/d/1H5DN8B64JUH9RaH-KEZHZ8Nb82HziHG-/preview", "icon": "💧", "pts": 15}],
+  "tiempo": [{"title": "Contando con los recursos – Bicentenario", "author": "MPPE 4º", "url": "https://drive.google.com/file/d/1iZOKSOfCZmT7wU1-PGKI9NHIy5aRJsW5/preview", "icon": "📗", "pts": 20}, {"title": "Fichas de Unidades de Medida", "author": "FichasdeMatematicas.com", "url": "https://drive.google.com/file/d/1H5DN8B64JUH9RaH-KEZHZ8Nb82HziHG-/preview", "icon": "⏰", "pts": 20}, {"title": "Cuaderno: Unidades de Tiempo", "author": "Colección primaria", "url": "https://drive.google.com/file/d/1H5DN8B64JUH9RaH-KEZHZ8Nb82HziHG-/preview", "icon": "🕐", "pts": 15}],
+  "temp": [{"title": "Segunda Cartilla – Matemáticas 4º", "author": "GUAO", "url": "https://drive.google.com/file/d/1nr5BPGIqVr4KvCbrD2x4oX2YOI28P-oX/preview", "icon": "📙", "pts": 20}, {"title": "Aprendemos a medir", "author": "IESOJA", "url": "https://drive.google.com/file/d/1_GmFNrhUc5a_uixrK10avTA25pl8k9gv/preview", "icon": "🌡️", "pts": 20}, {"title": "Medidas: Temperatura", "author": "Colección medidas", "url": "https://drive.google.com/file/d/1H5DN8B64JUH9RaH-KEZHZ8Nb82HziHG-/preview", "icon": "🌡️", "pts": 15}],
+  "sismtec": [{"title": "Actividades de Matemática 4º", "author": "MPPE", "url": "https://drive.google.com/file/d/12uXf_QWzWkYCezQmVbmGzNINBwgMnYTE/preview", "icon": "📘", "pts": 20}, {"title": "Sistema Métrico Decimal – Taller", "author": "Webcolegios", "url": "https://drive.google.com/file/d/1HMuE4yeQ8qbitWaCYjE5RNxrLkANbMqR/preview", "icon": "📏", "pts": 20}, {"title": "Fichas de Unidades de Medida", "author": "FichasdeMatematicas.com", "url": "https://drive.google.com/file/d/1H5DN8B64JUH9RaH-KEZHZ8Nb82HziHG-/preview", "icon": "📋", "pts": 15}],
+  "monetar": [{"title": "Contando con los recursos – Bicentenario", "author": "MPPE 4º", "url": "https://drive.google.com/file/d/1iZOKSOfCZmT7wU1-PGKI9NHIy5aRJsW5/preview", "icon": "📗", "pts": 20}, {"title": "Actividades de Matemática 4º", "author": "MPPE", "url": "https://drive.google.com/file/d/12uXf_QWzWkYCezQmVbmGzNINBwgMnYTE/preview", "icon": "📘", "pts": 20}, {"title": "Cuaderno: Sistema Monetario", "author": "Colección primaria", "url": "https://drive.google.com/file/d/1ILuIgKgDzg8WKLnIHUaURCCGMmS4shpL/preview", "icon": "💰", "pts": 15}],
+  "tablas": [{"title": "Contando con los recursos – Bicentenario", "author": "MPPE 4º", "url": "https://drive.google.com/file/d/1iZOKSOfCZmT7wU1-PGKI9NHIy5aRJsW5/preview", "icon": "📗", "pts": 20}, {"title": "Actividades de Matemática 4º", "author": "MPPE", "url": "https://drive.google.com/file/d/12uXf_QWzWkYCezQmVbmGzNINBwgMnYTE/preview", "icon": "📘", "pts": 20}, {"title": "Cuaderno: Tablas de Registro", "author": "Colección primaria", "url": "https://drive.google.com/file/d/15Qr_qovGnBofa1zAxoL-Z31cnpCRe8No/preview", "icon": "📊", "pts": 15}],
+  "barras": [{"title": "Segunda Cartilla – Matemáticas 4º", "author": "GUAO", "url": "https://drive.google.com/file/d/1nr5BPGIqVr4KvCbrD2x4oX2YOI28P-oX/preview", "icon": "📙", "pts": 20}, {"title": "Gráficos de barras – Guía 4º", "author": "Colegio Daniel de la Vega", "url": "https://drive.google.com/file/d/1SiVJwg2JPPGWYztiq3E7eL3tbax55jfu/preview", "icon": "📊", "pts": 20}, {"title": "Cuaderno: Gráficos y Pictogramas", "author": "Colección primaria", "url": "https://drive.google.com/file/d/15Qr_qovGnBofa1zAxoL-Z31cnpCRe8No/preview", "icon": "📈", "pts": 15}],
+  "picto": [{"title": "Actividades de Matemática 4º", "author": "MPPE", "url": "https://drive.google.com/file/d/12uXf_QWzWkYCezQmVbmGzNINBwgMnYTE/preview", "icon": "📘", "pts": 20}, {"title": "Gráficos de barras – Guía 4º", "author": "Colegio Daniel de la Vega", "url": "https://drive.google.com/file/d/1SiVJwg2JPPGWYztiq3E7eL3tbax55jfu/preview", "icon": "🖼️", "pts": 20}, {"title": "Cuaderno: Gráficos y Pictogramas", "author": "Colección primaria", "url": "https://drive.google.com/file/d/15Qr_qovGnBofa1zAxoL-Z31cnpCRe8No/preview", "icon": "📊", "pts": 15}],
+  "proba": [{"title": "Contando con los recursos – Bicentenario", "author": "MPPE 4º", "url": "https://drive.google.com/file/d/1iZOKSOfCZmT7wU1-PGKI9NHIy5aRJsW5/preview", "icon": "📗", "pts": 20}, {"title": "Actividades de Matemática 4º", "author": "MPPE", "url": "https://drive.google.com/file/d/12uXf_QWzWkYCezQmVbmGzNINBwgMnYTE/preview", "icon": "📘", "pts": 20}, {"title": "Cuaderno: Probabilidad y Estadística", "author": "Colección primaria", "url": "https://drive.google.com/file/d/1MAjXpSxrmW1kAB6yurEXlq-KRblmPfd_/preview", "icon": "🎲", "pts": 15}],
+  "estrat": [{"title": "Actividades de Matemática 4º", "author": "MPPE", "url": "https://drive.google.com/file/d/12uXf_QWzWkYCezQmVbmGzNINBwgMnYTE/preview", "icon": "📘", "pts": 20}, {"title": "Colección de problemas 4º", "author": "Orientación Andújar", "url": "https://drive.google.com/file/d/17P5M0Iw18Rqhh5tmvXDILlMm-HSU1o2d/preview", "icon": "🧩", "pts": 20}, {"title": "Práctica general 4º Primaria", "author": "Yo quiero aprobar", "url": "https://drive.google.com/file/d/1yDNiHhVKzazoH8g2Kmrdy4zLny0S9rUk/preview", "icon": "✏️", "pts": 15}],
+  "prob1op": [{"title": "Contando con los recursos – Bicentenario", "author": "MPPE 4º", "url": "https://drive.google.com/file/d/1iZOKSOfCZmT7wU1-PGKI9NHIy5aRJsW5/preview", "icon": "📗", "pts": 20}, {"title": "Colección de problemas 4º", "author": "Orientación Andújar", "url": "https://drive.google.com/file/d/17P5M0Iw18Rqhh5tmvXDILlMm-HSU1o2d/preview", "icon": "🧩", "pts": 20}, {"title": "Operaciones y Problemas", "author": "SEP", "url": "https://drive.google.com/file/d/1P7-qKw98cmR93j2qyEZmt4sRreLv1QIR/preview", "icon": "➕", "pts": 15}],
+  "prob2op": [{"title": "Segunda Cartilla – Matemáticas 4º", "author": "GUAO", "url": "https://drive.google.com/file/d/1nr5BPGIqVr4KvCbrD2x4oX2YOI28P-oX/preview", "icon": "📙", "pts": 20}, {"title": "Colección de problemas 4º", "author": "Orientación Andújar", "url": "https://drive.google.com/file/d/17P5M0Iw18Rqhh5tmvXDILlMm-HSU1o2d/preview", "icon": "🧩", "pts": 20}, {"title": "Práctica general 4º Primaria", "author": "Yo quiero aprobar", "url": "https://drive.google.com/file/d/1yDNiHhVKzazoH8g2Kmrdy4zLny0S9rUk/preview", "icon": "✏️", "pts": 15}],
+  "probcot": [{"title": "Actividades de Matemática 4º", "author": "MPPE", "url": "https://drive.google.com/file/d/12uXf_QWzWkYCezQmVbmGzNINBwgMnYTE/preview", "icon": "📘", "pts": 20}, {"title": "Colección de problemas 4º", "author": "Orientación Andújar", "url": "https://drive.google.com/file/d/17P5M0Iw18Rqhh5tmvXDILlMm-HSU1o2d/preview", "icon": "🧩", "pts": 20}, {"title": "Operaciones y Problemas", "author": "SEP", "url": "https://drive.google.com/file/d/1P7-qKw98cmR93j2qyEZmt4sRreLv1QIR/preview", "icon": "🏪", "pts": 15}]
+};
+
+const TOPICS_MAP = {
+  "numnat": {emoji:"🔢",title:"Números Naturales",bloque:"Números"},
+  "valpos": {emoji:"🏛️",title:"Valor Posicional",bloque:"Números"},
+  "compord": {emoji:"⚖️",title:"Comparar y Ordenar",bloque:"Números"},
+  "parimp": {emoji:"🔵",title:"Pares e Impares",bloque:"Números"},
+  "rectan": {emoji:"📏",title:"Recta Numérica",bloque:"Números"},
+  "numore": {emoji:"🥇",title:"Números Ordinales",bloque:"Números"},
+  "nurom": {emoji:"🏛️",title:"Números Romanos",bloque:"Números"},
+  "suma": {emoji:"➕",title:"Suma con Llevada",bloque:"Operaciones"},
+  "resta": {emoji:"➖",title:"Resta con Préstamo",bloque:"Operaciones"},
+  "calmen": {emoji:"🧠",title:"Cálculo Mental",bloque:"Operaciones"},
+  "probsr": {emoji:"🧩",title:"Problemas Suma y Resta",bloque:"Operaciones"},
+  "tabmul": {emoji:"✖️",title:"Tablas de Multiplicar",bloque:"Operaciones"},
+  "mul2": {emoji:"✖️",title:"Multiplicar 2 Cifras",bloque:"Operaciones"},
+  "mul3": {emoji:"✖️",title:"Multiplicar 3 Cifras",bloque:"Operaciones"},
+  "propmu": {emoji:"📝",title:"Propiedades Multiplicación",bloque:"Operaciones"},
+  "probmu": {emoji:"🧩",title:"Problemas de Multiplicación",bloque:"Operaciones"},
+  "div1": {emoji:"➗",title:"División por 1 Cifra",bloque:"Operaciones"},
+  "div2": {emoji:"➗",title:"División por 2 Cifras",bloque:"Operaciones"},
+  "relmul": {emoji:"🔁",title:"Relación Mult.÷Div.",bloque:"Operaciones"},
+  "probdi": {emoji:"🧩",title:"Problemas de División",bloque:"Operaciones"},
+  "frac": {emoji:"½",title:"¿Qué es una Fracción?",bloque:"Fracciones"},
+  "fracequiv": {emoji:"≈",title:"Fracciones Equivalentes",bloque:"Fracciones"},
+  "compfrac": {emoji:"⚖️",title:"Comparar Fracciones",bloque:"Fracciones"},
+  "opfrac": {emoji:"➕",title:"Suma y Resta de Fracciones",bloque:"Fracciones"},
+  "decimal": {emoji:"🔢",title:"Décimas y Centésimas",bloque:"Decimales"},
+  "lecdec": {emoji:"📖",title:"Leer y Escribir Decimales",bloque:"Decimales"},
+  "opdec": {emoji:"➕",title:"Suma y Resta de Decimales",bloque:"Decimales"},
+  "polig": {emoji:"🔷",title:"Polígonos y Figuras Planas",bloque:"Geometría"},
+  "cuerpos3d": {emoji:"📦",title:"Cuerpos Geométricos 3D",bloque:"Geometría"},
+  "angulos": {emoji:"📐",title:"Ángulos",bloque:"Geometría"},
+  "lineas": {emoji:"📏",title:"Líneas Paralelas y Perp.",bloque:"Geometría"},
+  "perim": {emoji:"📐",title:"Perímetro",bloque:"Geometría"},
+  "area": {emoji:"🔳",title:"Área",bloque:"Geometría"},
+  "simetria": {emoji:"🪞",title:"Simetría",bloque:"Geometría"},
+  "oresp": {emoji:"🧭",title:"Orientación Espacial",bloque:"Geometría"},
+  "longit": {emoji:"📏",title:"Longitud (cm, m, km)",bloque:"Medidas"},
+  "masa": {emoji:"⚖️",title:"Masa (g y kg)",bloque:"Medidas"},
+  "capac": {emoji:"💧",title:"Capacidad (mL y L)",bloque:"Medidas"},
+  "tiempo": {emoji:"🕐",title:"Unidades de Tiempo",bloque:"Medidas"},
+  "temp": {emoji:"🌡️",title:"Temperatura",bloque:"Medidas"},
+  "sismtec": {emoji:"📋",title:"Sistema Métrico Decimal",bloque:"Medidas"},
+  "monetar": {emoji:"💰",title:"Sistema Monetario",bloque:"Medidas"},
+  "tablas": {emoji:"📊",title:"Tablas de Datos",bloque:"Estadística"},
+  "barras": {emoji:"📊",title:"Gráficos de Barras",bloque:"Estadística"},
+  "picto": {emoji:"🖼️",title:"Pictogramas",bloque:"Estadística"},
+  "proba": {emoji:"🎲",title:"Probabilidad Básica",bloque:"Estadística"},
+  "estrat": {emoji:"🎯",title:"Estrategias de Resolución",bloque:"Resolución"},
+  "prob1op": {emoji:"1️⃣",title:"Problemas: 1 Operación",bloque:"Resolución"},
+  "prob2op": {emoji:"2️⃣",title:"Problemas: 2 Operaciones",bloque:"Resolución"},
+  "probcot": {emoji:"🏪",title:"Problemas Cotidianos",bloque:"Resolución"}
+};
+
+const BLOQUE_COLORS = {"Números": "#1976D2", "Operaciones": "#E65100", "Fracciones": "#7B1FA2", "Decimales": "#00838F", "Geometría": "#2E7D32", "Medidas": "#C62828", "Estadística": "#E65100", "Resolución": "#37474F"};
+
+let currentTopic = null;
+let currentTab = 'libros';
+
+// Init: keep all bloques open
+document.querySelectorAll('.bloque-items').forEach(el => {
+  el.style.maxHeight = el.scrollHeight + 'px';
+});
+
+function toggleBloque(name) {
+  const el = document.getElementById('bloque-' + name);
+  el.classList.toggle('collapsed');
+  if (!el.classList.contains('collapsed')) el.style.maxHeight = el.scrollHeight + 'px';
+  else el.style.maxHeight = '0';
+}
+
+function selectTopic(key) {
+  currentTopic = key;
+  document.querySelectorAll('.topic-item').forEach(e => e.classList.remove('active'));
+  const item = document.getElementById('item-' + key);
+  if (item) item.classList.add('active');
+  renderPanel(key);
+}
+
+function renderPanel(key) {
+  const t = TOPICS_MAP[key];
+  const libros = LIBROS[key] || [];
+  const color = BLOQUE_COLORS[t.bloque] || '#1565C0';
+  var encAll = (typeof ENCUESTAS_ALL !== 'undefined') ? ENCUESTAS_ALL : {};
+  var tieneEncuesta = !!encAll[key];
+  const tabEnc = tieneEncuesta
+    ? `<div class="tab" id="tab-btn-encuesta" onclick="switchTab('encuesta',this)">📝 Encuesta</div>`
+    : '';
+  const panelEnc = tieneEncuesta
+    ? `<div id="tab-encuesta" style="display:none"></div>`
+    : '';
+
+  document.getElementById('content').innerHTML = `
+    <div class="topic-panel">
+      <div class="topic-header">
+        <div class="topic-emoji">${t.emoji}</div>
+        <div class="topic-info">
+          <h1>${t.title}</h1>
+          <p>${t.bloque} · ${libros.length} libro${libros.length!==1?'s':''} disponible${libros.length!==1?'s':''}</p>
+        </div>
+      </div>
+      <div class="tabs">
+        <div class="tab active" id="tab-btn-libros" onclick="switchTab('libros',this)">📚 Libros</div>
+        <div class="tab" id="tab-btn-videos" onclick="switchTab('videos',this)">🎬 Videos</div>
+        ${tabEnc}
+      </div>
+      <div id="tab-libros">${renderLibros(libros, color)}</div>
+      <div id="tab-videos" style="display:none">
+        <div class="video-placeholder">
+          <div class="icon">🚧</div>
+          <h3>En desarrollo – Próximamente</h3>
+          <p>Los videos de este tema estarán disponibles pronto.</p>
+        </div>
+      </div>
+      ${panelEnc}
+    </div>
+  `;
+}
+
+function renderLibros(libros, color) {
+  if (!libros.length) return '<p style="color:#999;padding:20px">No hay libros disponibles aún.</p>';
+  return '<div class="books-grid">' + libros.map(b => `
+    <div class="book-card" onclick="openBook('${b.url}','${b.title}')">
+      <div class="book-icon">${b.icon}</div>
+      <div class="book-title">${b.title}</div>
+      <div class="book-author">${b.author}</div>
+      <span class="book-pts">⭐ ${b.pts} pts</span>
+      <button class="book-btn" style="background:${color||'#1565C0'}">📖 Abrir libro</button>
+    </div>
+  `).join('') + '</div>';
+}
+
+function switchTab(tab, el) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('tab-libros').style.display = tab==='libros' ? '' : 'none';
+  document.getElementById('tab-videos').style.display = tab==='videos' ? '' : 'none';
+  var encEl = document.getElementById('tab-encuesta');
+  if (encEl) {
+    encEl.style.display = tab==='encuesta' ? '' : 'none';
+    if (tab==='encuesta' && !encEl.dataset.loaded) {
+      encEl.innerHTML = renderEncuesta(currentTopic);
+      encEl.dataset.loaded = '1';
+    }
+  }
+}
+
+function openBook(url, title) {
+  const params = new URLSearchParams({url, title});
+  window.open('lector.html?' + params.toString(), '_blank');
+}
+</script>
+
+<script>
+// ── TEMA OSCURO ──────────────────────────────────────────
+const themeBtn = document.getElementById('themeBtn');
+function applyTheme(dark){
+  document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light');
+  themeBtn.textContent = dark ? '☀️' : '🌙';
+  localStorage.setItem('biblioTheme', dark ? 'dark' : 'light');
+}
+(function(){
+  const saved = localStorage.getItem('biblioTheme');
+  applyTheme(saved === 'dark');
+})();
+function toggleTheme(){
+  const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+  applyTheme(!isDark);
+}
+
+// ── SIDEBAR MÓVIL ────────────────────────────────────────
+const sidebar = document.querySelector('.sidebar');
+const overlay = document.getElementById('sidebarOverlay');
+function toggleSidebar(){
+  sidebar.classList.toggle('open');
+  overlay.classList.toggle('open');
+  document.body.style.overflow = sidebar.classList.contains('open') ? 'hidden' : '';
+}
+// Cerrar sidebar al seleccionar tema en móvil
+const origSelect = window.selectTopic;
+window.selectTopic = function(id){
+  origSelect(id);
+  if(window.innerWidth <= 700){
+    sidebar.classList.remove('open');
+    overlay.classList.remove('open');
+    document.body.style.overflow = '';
+  }
+};
+</script>
+
+<!-- WIDGET DE SESIÓN – añadir antes de <script>
+(function(){
+  var tema = new URLSearchParams(window.location.search).get("tema");
+  function trySelect(){
+    if(typeof selectTopic==="function"){ selectTopic(tema); }
+  }
+  if(tema){ setTimeout(trySelect, 500); }
+})();
+</script>
+</body> en todas las páginas -->
+<script>
+(function(){
+  // Redirigir a login si no hay sesión
+  const raw = localStorage.getItem('biblioSesion');
+  if(!raw){ window.location.href = 'login.html?next=' + encodeURIComponent(window.location.href); return; }
+  let sesion;
+  try{ sesion = JSON.parse(raw); }catch(e){ window.location.href = 'login.html'; return; }
+
+  // Inyectar badge en el header
+  const badge = document.createElement('div');
+  badge.id = 'sessionBadge';
+  badge.style.cssText = `
+    position:fixed;bottom:16px;right:16px;z-index:999;
+    background:var(--surface,#fff);border:1px solid var(--border,#e0e7ff);
+    border-radius:50px;padding:8px 14px;display:flex;align-items:center;gap:8px;
+    box-shadow:0 4px 16px rgba(0,0,0,.15);font-family:'Satoshi',sans-serif;
+    font-size:.8rem;color:var(--text,#1a1a2e);cursor:pointer;transition:.2s;
+  `;
+  const puntosActuales = sesion.puntos || 0;
+  badge.innerHTML = '<span style="font-size:1.1rem">&#128100;</span>' +
+    '<span><strong class="badge-nombre">' + sesion.nombre + '</strong><br>' +
+    '<span class="badge-pts" style="color:#f59e0b;font-weight:700">&#11088; ' + (sesion.puntos||0) + ' pts</span></span>' +
+    '<span title="Cerrar sesion" onclick="cerrarSesion()" style="margin-left:4px;opacity:.5;font-size:16px;line-height:1">&#x2715;</span>';
+  badge.onclick = function(e){ if(e.target.title !== 'Cerrar sesión') return; };
+  document.body.appendChild(badge);
+
+  window.cerrarSesion = function(){
+    if(confirm('¿Seguro que quieres cerrar sesión, ' + sesion.nombre + '?')){
+      localStorage.removeItem('biblioSesion');
+      window.location.href = 'login.html';
+    }
+  };
+})();
+
+// ── ENCUESTA / QUIZ ───────────────────────────────────────────────────────
+var _quizState = {};  // estado de la quiz activa
+
+function renderEncuesta(topicId) {
+  var enc = (typeof ENCUESTAS_ALL !== 'undefined') ? ENCUESTAS_ALL[topicId] : null;
+  if (!enc) return '<p style="color:#aaa;padding:20px;font-size:.9rem">No hay encuesta disponible para este tema.</p>';
+
+  var log   = getEncuestasLog();
+  var entry = log[topicId];
+  var maxPts = enc.preguntas.length * enc.ptsCorrecta + enc.ptsPerfecto;
+
+  if (entry && entry.aprobado) {
+    // Aprobado → bloqueado permanentemente
+    return '<div class="enc-wrap">' +
+      '<div class="enc-status">' +
+      '<span class="enc-icon">&#127942;</span>' +
+      '<div class="enc-txt"><strong>&#161;Ya completaste esta encuesta!</strong><br>' +
+      '<span class="enc-pts">+' + entry.pts + ' puntos ganados</span></div>' +
+      '</div>' +
+      '<div class="quiz-result">' +
+      '<span class="res-emoji">&#11088;</span>' +
+      '<h3>Encuesta completada</h3>' +
+      '<p>Vuelve a leer el tema para reforzar lo aprendido.</p>' +
+      '</div></div>';
+  }
+
+  if (entry && !entry.aprobado) {
+    // Falló → verificar si han pasado 12 horas
+    var ahora   = Date.now();
+    var fechaInt= new Date(entry.fecha).getTime();
+    var diff    = ahora - fechaInt;
+    var ESPERA  = 12 * 3600 * 1000;
+
+    if (diff < ESPERA) {
+      // Aún en espera
+      var restMs  = ESPERA - diff;
+      var horas   = Math.floor(restMs / 3600000);
+      var minutos = Math.floor((restMs % 3600000) / 60000);
+      return '<div class="enc-wrap">' +
+        '<div class="enc-status" style="border-left:4px solid #ef4444">' +
+        '<span class="enc-icon">⏳</span>' +
+        '<div class="enc-txt"><strong>Intento no aprobado</strong><br>' +
+        '<span class="enc-pts" style="color:#ef4444">Podrás reintentar en ' + horas + 'h ' + minutos + 'min</span></div>' +
+        '</div></div>';
+    }
+    // Han pasado 12h → permitir reintento
+  }
+
+  // Disponible (primera vez o reintento habilitado)
+  var retryTxt = (entry && !entry.aprobado)
+    ? '<p style="font-size:.8rem;color:#10b981;margin-bottom:8px">✅ ¡Ya puedes reintentar la encuesta!</p>'
+    : '';
+
+  return '<div class="enc-wrap">' +
+    '<div class="enc-status bloq">' +
+    '<span class="enc-icon">&#128221;</span>' +
+    '<div class="enc-txt">&#161;Lee los libros y responde la encuesta para ganar puntos!<br>' +
+    '<span class="enc-pts">Hasta ' + maxPts + ' puntos disponibles &#11088;</span></div>' +
+    '</div><br>' +
+    retryTxt +
+    '<button class="enc-btn" onclick="iniciarQuiz(currentTopic)">&#128640; &#161;Iniciar encuesta!</button>' +
+    '</div>';
+}
+
+
+function iniciarQuiz(topicId) {
+  var enc = (typeof ENCUESTAS_ALL !== 'undefined') ? ENCUESTAS_ALL[topicId] : null;
+  if (!enc) return;
+  _quizState = { topicId: topicId, enc: enc, current: 0, correctas: 0, answered: false };
+  renderPregunta();
+}
+
+function renderPregunta() {
+  var s   = _quizState;
+  var enc = s.enc;
+  var q   = enc.preguntas[s.current];
+  var pct = Math.round((s.current / enc.preguntas.length) * 100);
+
+  var optsHtml = '';
+  for (var i = 0; i < q.ops.length; i++) {
+    optsHtml += '<button class="quiz-opt" onclick="responder(' + i + ')">' + q.ops[i] + '</button>';
+  }
+
+  var html =
+    '<div class="enc-wrap">' +
+    '<div class="quiz-wrap">' +
+    '<div class="quiz-progress">' +
+    '<div class="quiz-bar-bg"><div class="quiz-bar" style="width:' + pct + '%"></div></div>' +
+    '<span class="quiz-qnum">Pregunta ' + (s.current+1) + ' / ' + enc.preguntas.length + '</span>' +
+    '</div>' +
+    '<p class="quiz-q">' + q.p + '</p>' +
+    '<div class="quiz-opts">' + optsHtml + '</div>' +
+    '<div class="quiz-feedback" id="qFeedback"></div>' +
+    '<button class="quiz-next" id="qNext" onclick="siguientePregunta()">Siguiente ➡️</button>' +
+    '</div></div>';
+
+  document.getElementById('tab-encuesta').innerHTML = html;
+}
+
+function responder(idx) {
+  if (_quizState.answered) return;
+  _quizState.answered = true;
+  var q    = _quizState.enc.preguntas[_quizState.current];
+  var opts = document.querySelectorAll('.quiz-opt');
+  var fb   = document.getElementById('qFeedback');
+  var next = document.getElementById('qNext');
+
+  opts.forEach(function(b) { b.disabled = true; });
+  opts[q.r].classList.add('reveal');  // mostrar correcta
+
+  if (idx === q.r) {
+    _quizState.correctas++;
+    opts[idx].classList.add('correct');
+    fb.textContent = '✅ ¡Correcto!';
+    fb.className   = 'quiz-feedback show ok';
+  } else {
+    opts[idx].classList.add('wrong');
+    fb.textContent = '❌ Incorrecto. La respuesta correcta está marcada en verde.';
+    fb.className   = 'quiz-feedback show fail';
+  }
+  next.className = 'quiz-next show';
+}
+
+function siguientePregunta() {
+  _quizState.current++;
+  _quizState.answered = false;
+  if (_quizState.current < _quizState.enc.preguntas.length) {
+    renderPregunta();
+  } else {
+    mostrarResultado();
+  }
+}
+
+function mostrarResultado() {
+  var s      = _quizState;
+  var enc    = s.enc;
+  var aprobado = (s.correctas / enc.preguntas.length) >= 0.6;
+  var pts    = s.correctas * enc.ptsCorrecta;
+  var perfecto = s.correctas === enc.preguntas.length;
+  if (perfecto) pts += enc.ptsPerfecto;
+
+  // Solo sumar puntos si aprobó o si es la primera vez que intenta
+  var logPrev = getEncuestasLog()[s.topicId];
+  if (!logPrev || aprobado) {
+    sumarPuntosEncuesta(pts);
+  }
+  marcarEncuesta(s.topicId, pts, aprobado);
+
+  var total = (typeof getSesionPts === 'function') ? getSesionPts() : 0;
+  var pct   = Math.round((s.correctas / enc.preguntas.length) * 100);
+  var emoji = pct === 100 ? '🏆' : pct >= 60 ? '🎉' : '📖';
+  var msg   = pct === 100
+    ? '¡Perfecto! ¡Respondiste todo correctamente!'
+    : pct >= 60
+    ? '¡Muy bien! Sigue practicando para mejorar.'
+    : 'Vuelve a leer el tema. Podrás intentarlo de nuevo en <strong>12 horas</strong>.';
+  var bonusTxt = perfecto
+    ? '<p style="color:#f59e0b;font-weight:700">+' + enc.ptsPerfecto + ' puntos BONUS por puntaje perfecto 🌟</p>'
+    : '';
+  var ptsTxt = aprobado
+    ? '<div class="res-pts">+' + pts + ' puntos ⭐</div>' + bonusTxt
+    : '<div class="res-pts" style="color:#ef4444">+0 puntos — no aprobado</div>';
+
+  document.getElementById('tab-encuesta').innerHTML =
+    '<div class="enc-wrap"><div class="quiz-result">' +
+    '<span class="res-emoji">' + emoji + '</span>' +
+    '<h3>' + s.correctas + ' / ' + enc.preguntas.length + ' correctas (' + pct + '%)</h3>' +
+    ptsTxt +
+    '<p>' + msg + '</p>' +
+    (aprobado ? '<p style="font-size:.8rem;color:#999">Total acumulado: ' + total + ' pts</p>' : '') +
+    '</div></div>';
+
+  if (typeof window.refreshBadge === 'function') window.refreshBadge();
+}
+</script>
+
+<script>
+(function(){
+  var tema = new URLSearchParams(window.location.search).get("tema");
+  function trySelect(){
+    if(typeof selectTopic==="function"){ selectTopic(tema); }
+  }
+  if(tema){ setTimeout(trySelect, 500); }
+})();
+</script>
+</body>
+</html>
